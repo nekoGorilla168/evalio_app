@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "441744914353",
+    "firebase_url": "https://evalio-app-project.firebaseio.com",
+    "project_id": "evalio-app-project",
+    "storage_bucket": "evalio-app-project.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:441744914353:android:580d1356c97a1678a46f90",
+        "android_client_info": {
+          "package_name": "io.app.nekogorilla168.evalio_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "441744914353-i8f84f7d5taps6gdtaipc4pl6uaqsqb8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBlJPhiXF53bt-tceGyi3D3ZuYqCHzWc84"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "441744914353-i8f84f7d5taps6gdtaipc4pl6uaqsqb8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
