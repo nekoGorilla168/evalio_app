@@ -1,22 +1,30 @@
 import 'package:evalio_app/blocs/bottom-navibar-bloc.dart';
+import 'package:evalio_app/blocs/user-bloc.dart';
+import 'package:evalio_app/presentation/constant/posts_list_app_bar.dart';
+import 'package:evalio_app/presentation/posts/posts_list.dart';
+import 'package:evalio_app/presentation/settings/logout.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    // インデックスコントロール
     final _ctrlIndex = Provider.of<BottomNaviBarBloc>(context);
+    final _ctrlUser = Provider.of<UserBloc>(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('evalio'),
+      appBar: AppBarList().appBarList.elementAt(_ctrlIndex.getCurIndex),
+      body: IndexedStack(
+        index: _ctrlIndex.getCurIndex,
+        children: NaviList().pageWidgets,
       ),
-      body: NaviList().pageWidgets.elementAt(_ctrlIndex.getCurIndex),
       bottomNavigationBar: BottomNavibarConst(),
     );
   }
 }
 
+// テスト用
 class PageWidget extends StatelessWidget {
   final Color color;
   final String title;
@@ -39,14 +47,25 @@ class PageWidget extends StatelessWidget {
   }
 }
 
-class NaviList {
-  final pageWidgets = [
-    PageWidget(color: Colors.white, title: '一覧'),
-    PageWidget(color: Colors.blue, title: 'プロフィール'),
-    PageWidget(color: Colors.orange, title: 'その他'),
+// appBarリスト
+class AppBarList {
+  final appBarList = [
+    PostsListAppBar(),
+    PostsListAppBar(),
+    PostsListAppBar(),
   ];
 }
 
+// ナビゲーションリスト
+class NaviList {
+  final pageWidgets = [
+    PostsList(),
+    PageWidget(color: Colors.blue, title: 'プロフィール'),
+    Settings(),
+  ];
+}
+
+// ボトムナビバークラス
 class BottomNavibarConst extends StatelessWidget {
   @override
   Widget build(BuildContext context) {

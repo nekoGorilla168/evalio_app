@@ -1,4 +1,6 @@
 import 'package:evalio_app/blocs/bottom-navibar-bloc.dart';
+import 'package:evalio_app/blocs/posts_bloc.dart';
+import 'package:evalio_app/blocs/user-bloc.dart';
 import 'package:evalio_app/presentation/home/evalio_home.dart';
 import 'package:evalio_app/presentation/login/login.dart';
 import 'package:flutter/material.dart';
@@ -17,11 +19,23 @@ class EvalioApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        // ナビバープロバイダ
         ChangeNotifierProvider<BottomNaviBarBloc>(
           create: (_) => BottomNaviBarBloc(),
         ),
+        // ユーザー情報プロバイダ
+        Provider<UserBloc>(
+          create: (_) => UserBloc(),
+          dispose: (_, bloc) => bloc.dispose(),
+        ),
+        // 投稿一覧プロバイダ
+        Provider<PostsBloc>(
+          create: (_) => PostsBloc(),
+          dispose: (_, bloc) => bloc.dispose(),
+        ),
       ],
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         initialRoute: '/loggedIn',
         routes: {
           '/loggedIn': (context) => LoggedIn(),

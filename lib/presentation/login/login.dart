@@ -1,26 +1,20 @@
+import 'package:evalio_app/blocs/user-bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_twitter/flutter_twitter.dart';
+import 'package:provider/provider.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
-class LoggedIn extends StatefulWidget {
-  LoggedIn();
-  @override
-  _LoggedIn createState() {
-    return _LoggedIn();
-  }
-}
-
-class _LoggedIn extends State<LoggedIn> {
-  FirebaseUser _user;
-
+class LoggedIn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final _ctrlUser = Provider.of<UserBloc>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text('ログイン'),
+        leading: Container(),
       ),
       body: Center(
         child: Column(
@@ -34,23 +28,19 @@ class _LoggedIn extends State<LoggedIn> {
                   style: TextStyle(color: Colors.white), // 文字色(白)
                 ),
                 onPressed: () {
-                  _toHomePage();
+                  _signInTwitter().then((response) {
+                    // ユーザー情報有
+                    if (response != null) {
+                      _ctrlUser.createFUser(response);
+                    }
+                    Navigator.pushNamed(context, '/home');
+                  });
                 } // Twitterログイン
                 ),
           ],
         ),
       ),
     );
-  }
-
-  void _toHomePage() {
-    _signInTwitter().then((response) {
-      if (response != null) {
-        _user = response;
-        setState(() {});
-        Navigator.pushNamed(context, '/home', arguments: _user);
-      }
-    });
   }
 
   Future<FirebaseUser> _signInTwitter() async {
