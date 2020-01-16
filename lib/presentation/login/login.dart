@@ -11,6 +11,7 @@ class LoggedIn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final _ctrlUser = Provider.of<UserBloc>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Text('ログイン'),
@@ -28,15 +29,10 @@ class LoggedIn extends StatelessWidget {
                   style: TextStyle(color: Colors.white), // 文字色(白)
                 ),
                 onPressed: () {
-                  _signInTwitter().then((response) {
-                    // ユーザー情報有
-                    if (response != null) {
-                      _ctrlUser.createFUser(response);
-                    }
-                    Navigator.pushNamed(context, '/home');
-                  });
-                } // Twitterログイン
-                ),
+                  // ログイン情報取得
+                  _ctrlUser.getLoginUser();
+                  Navigator.popAndPushNamed(context, '/home');
+                }),
           ],
         ),
       ),

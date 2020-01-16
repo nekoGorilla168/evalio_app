@@ -7,21 +7,31 @@ class PostsBloc {
   // 投稿リストリポジトリ
   final _postRepository = PostsRepositpry();
 
-  final _allPostsController = StreamController<List<PostModel>>.broadcast();
-
-  Stream<List<PostModel>> get getPostsList => _allPostsController.stream;
+  // いいね順
+  final _trendPostsController = StreamController<List<PostModel>>.broadcast();
+  Stream<List<PostModel>> get getPostsList => _trendPostsController.stream;
+  // 最新順
+  final _newPostsController = StreamController<List<PostModel>>.broadcast();
+  Stream<List<PostModel>> get newPostsList => _newPostsController.stream;
 
   // コンストラクタ
   PostsBloc() {
-    getPosts();
+    getTrendPostsList();
+    getNewPostsList();
   }
 
-  void getPosts() async {
-    List<PostModel> _postModel = await _postRepository.getPosts();
-    _allPostsController.sink.add(_postModel);
+  void getTrendPostsList() async {
+    List<PostModel> _postModel = await _postRepository.getTrendPosts();
+    _trendPostsController.sink.add(_postModel);
+  }
+
+  void getNewPostsList() async {
+    List<PostModel> _postModel = await _postRepository.getNewPosts();
+    _newPostsController.sink.add(_postModel);
   }
 
   void dispose() {
-    _allPostsController.close();
+    _trendPostsController.close();
+    _newPostsController.close();
   }
 }

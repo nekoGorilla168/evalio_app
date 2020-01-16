@@ -20,7 +20,7 @@ class PostModel {
   // 名前付きコンストラクタ
   PostModel.fromMap(Map map) {
     this.postId = map[PostModelField.postId];
-    this.postUserId = map[PostModelField.postUserId];
+    //this.postUserId = map[PostModelField.postUserId];
     this.content = map[PostModelField.content];
     this.title = map[PostModelField.title];
     this.likesCount = map[PostModelField.likesCount];
@@ -42,7 +42,7 @@ class PostModel {
 // FireStoreのフィールド名
 class PostModelField {
   static const postId = "postId";
-  static const postUserId = "postUserIdref";
+  static const postUserId = "postUserIdRef";
   static const content = "content";
   static const title = "title";
   static const likesCount = "likesCount";
