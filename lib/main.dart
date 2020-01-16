@@ -1,4 +1,5 @@
 import 'package:evalio_app/blocs/bottom-navibar-bloc.dart';
+import 'package:evalio_app/blocs/display_post_list_bloc.dart';
 import 'package:evalio_app/blocs/posts_bloc.dart';
 import 'package:evalio_app/blocs/user-bloc.dart';
 import 'package:evalio_app/presentation/home/evalio_home.dart';
@@ -20,8 +21,11 @@ class EvalioApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         // ナビバープロバイダ
-        ChangeNotifierProvider<BottomNaviBarBloc>(
-          create: (_) => BottomNaviBarBloc(),
+        ChangeNotifierProvider<NavigationBarBloc>(
+          create: (_) => NavigationBarBloc(),
+        ),
+        ChangeNotifierProvider<DisplayPostsListBloc>(
+          create: (_) => DisplayPostsListBloc(),
         ),
         // ユーザー情報プロバイダ
         Provider<UserBloc>(
@@ -38,6 +42,7 @@ class EvalioApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         initialRoute: '/loggedIn',
         routes: {
+//          '/': (context) => Loading();
           '/loggedIn': (context) => LoggedIn(),
           '/home': (context) => Home(),
         },

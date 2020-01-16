@@ -5,6 +5,17 @@ class UserDao {
   // ルートコレクション
   var fs = Firestore.instance.collection("users");
 
+  // ユーザー登録状態チェック
+  Future<bool> checkRegisteredUser(String id) async {
+    bool isExist = false;
+
+    DocumentSnapshot doc = await fs.document(id).get();
+    if (doc.data.length != 0) {
+      isExist = true;
+    }
+    return isExist;
+  }
+
   // ユーザー情報新規登録
   insertUserInfo(UserModel userModel) {
     fs.document(userModel.userId).setData({

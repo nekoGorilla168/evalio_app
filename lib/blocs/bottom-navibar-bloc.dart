@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-class BottomNaviBarBloc with ChangeNotifier {
+class NavigationBarBloc with ChangeNotifier {
   // 選択ナビのインデックス
-  int _curIndex = 0;
-  int get getCurIndex => _curIndex;
+  int _navBarIndex = 0;
+  int get getCurIndex => _navBarIndex;
 
-  void selectedIndexChanged(int index) {
-    _curIndex = index;
+  void selectedNavBarIndexChanged(int index) {
+    _navBarIndex = index;
     notifyListeners();
   }
 }

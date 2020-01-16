@@ -3,10 +3,23 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class PostsDao {
   // ルートコレクション取得
   final fs = Firestore.instance.collection("posts");
+  final int maxKensu = 10;
 
-  // 投稿ポートフォリオ取得(最大10件まで)
-  Future<List<DocumentSnapshot>> getPostsList() async {
-    QuerySnapshot qs = await fs.limit(10).getDocuments();
+  // いいね数順取得(上限10件)
+  Future<List<DocumentSnapshot>> getTrendPostsList() async {
+    QuerySnapshot qs = await fs
+        .orderBy("likesCount", descending: true)
+        .limit(maxKensu)
+        .getDocuments();
+    return qs.documents;
+  }
+
+  // 最新順取得
+  Future<List<DocumentSnapshot>> getNewPostsList() async {
+    QuerySnapshot qs = await fs
+        .orderBy("createdAt", descending: false)
+        .limit(maxKensu)
+        .getDocuments();
     return qs.documents;
   }
 }
