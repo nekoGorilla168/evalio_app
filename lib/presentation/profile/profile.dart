@@ -1,6 +1,7 @@
 import 'package:evalio_app/blocs/user-bloc.dart';
 import 'package:evalio_app/models/user_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_share_me/flutter_share_me.dart';
 import 'package:provider/provider.dart';
 
 class Profile extends StatelessWidget {
@@ -16,33 +17,27 @@ class Profile extends StatelessWidget {
               child: CircularProgressIndicator(),
             );
           } else {
-            return Padding(
-              padding: EdgeInsets.only(top: 5.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                mainAxisSize: MainAxisSize.max,
-                children: <Widget>[
-                  Container(
-                    width: 110.0,
-                    height: 110.0,
-                    decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        image: DecorationImage(
-                          fit: BoxFit.fill,
-                          image: NetworkImage(snapshot.data.photoUrl),
-                        )),
-                  ),
-                  Column(
-                    children: <Widget>[
-                      Text(snapshot.data.userName),
-                      Text(snapshot.data.createdAt.toString()),
-                    ],
-                  ),
-                  Divider(
-                    color: Colors.blueGrey,
-                  )
-                ],
-              ),
+            return Column(
+              children: <Widget>[
+                Row(
+                  children: <Widget>[],
+                ),
+                Card(
+                  child: Text('自己紹介'),
+                ),
+                Card(
+                  child: Text('好きな興味のある技術'),
+                ),
+                FlatButton(
+                  onPressed: () async {
+                    var response = await FlutterShareMe().shareToTwitter(
+                      url: '',
+                      msg: '#evalio #Twitter転職',
+                    );
+                  },
+                  child: Text('Twitterで共有する'),
+                )
+              ],
             );
           }
         });

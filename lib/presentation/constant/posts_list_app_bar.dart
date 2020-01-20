@@ -25,10 +25,6 @@ class PostsListAppBar extends StatelessWidget with PreferredSizeWidget {
                 title: Text('evalio'),
                 centerTitle: true,
                 actions: <Widget>[
-//                  CircleAvatar(
-//                    radius: 27,
-//                    backgroundImage: NetworkImage(snapshot.data.photoUrl),
-//                  ),
                   CachedNetworkImage(
                     imageUrl: snapshot.data.photoUrl,
                     imageBuilder: (context, imgProvider) => Container(

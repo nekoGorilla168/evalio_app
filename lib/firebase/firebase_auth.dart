@@ -16,9 +16,10 @@ class FireAuth {
 
     switch (result.status) {
       case TwitterLoginStatus.loggedIn:
-        //var session = result.session;
-        FirebaseUser twUser = await _signInWithTwitter(
-            result.session.token, result.session.secret);
+        var session = result.session;
+        debugPrint(session.toString());
+        FirebaseUser twUser =
+            await _signInWithTwitter(session.token, session.secret);
         return twUser;
         break;
       case TwitterLoginStatus.cancelledByUser:
@@ -44,7 +45,7 @@ class FireAuth {
     assert(await user.getIdToken() != null);
 
     final FirebaseUser currentUser = await _auth.currentUser();
-    if(user.uid == currentUser.uid){
+    if (user.uid == currentUser.uid) {
       return user;
     }
   }

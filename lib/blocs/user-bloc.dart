@@ -17,16 +17,6 @@ class UserBloc {
 
   Stream<String> get getId => _idController.stream;
 
-  // ユーザー情報の作成
-//  void createFUser(FirebaseUser user) {
-//    var userModel = new UserModel(
-//      userId: user.uid,
-//      userName: user.displayName,
-//      photoUrl: user.photoUrl,
-//    );
-//    _userController.sink.add(userModel);
-//  }
-
   // コンストラクタ
   UserBloc() {
     checkLoggedIn();
@@ -39,8 +29,18 @@ class UserBloc {
     _idController.sink.add(_id);
   }
 
-  void getLoginUser() async {
-    UserModel userModel = await _authRepository.getFromFirebaseAuth();
+  // 新規登録
+  void shinkiToroku(UserModel userModel) async {
+    await _authRepository.insertUser(userModel);
+    getUserInfo(userModel.userId);
+    // ローカルストレージに保存
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString(DotEnv().env['TWITTER_REGISTERED'], userModel.userId);
+  }
+
+  // ユーザー情報取得
+  void getUserInfo(String userId) async {
+    UserModel userModel = await _authRepository.getUser(userId);
     _userController.sink.add(userModel);
   }
 

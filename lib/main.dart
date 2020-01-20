@@ -7,15 +7,27 @@ import 'package:evalio_app/presentation/login/login.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 Future main() async {
   // 環境変数Load
   await DotEnv().load('.env');
-  runApp(EvalioApp());
+  String userInfo = await checkLoggedIn();
+  runApp(EvalioApp(userInfo));
+}
+
+// ログインチェック
+Future<String> checkLoggedIn() async {
+  final SharedPreferences pref = await SharedPreferences.getInstance();
+  return pref.getString(DotEnv().env['TWITTER_REGISTERED']);
 }
 
 // ルートクラス
 class EvalioApp extends StatelessWidget {
+  final userInfo;
+
+  EvalioApp(this.userInfo);
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -39,12 +51,15 @@ class EvalioApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
+        theme: ThemeData(
+          brightness: Brightness.light,
+          primaryColor: Colors.white,
+        ),
         debugShowCheckedModeBanner: false,
-        initialRoute: '/loggedIn',
+        initialRoute: userInfo == null ? '/loggedIn' : '/home',
         routes: {
-//          '/': (context) => Loading();
           '/loggedIn': (context) => LoggedIn(),
-          '/home': (context) => Home(),
+          '/home': (context) => Home(userInfo),
         },
       ),
     );

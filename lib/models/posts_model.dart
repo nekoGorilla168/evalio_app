@@ -9,7 +9,7 @@ class PostModel {
   String title; // ポートフォリオタイトル
   String theme; // ポートフォリオ詳細
   int likesCount; // お気に入りにされた数
-  String programmingLanguages; // 使用技術
+  List programmingLanguage; // 使用技術
   DateTime createdAt; // 投稿日
   DateTime updatedAt; // 更新日
   //UserModel userModel; // 投稿したユーザーのモデルクラス
@@ -21,6 +21,7 @@ class PostModel {
   PostModel.fromMap(Map map) {
     this.postId = map[PostModelField.postId];
     //this.postUserId = map[PostModelField.postUserId];
+    this.programmingLanguage = map[PostModelField.programmingLanguage];
     this.content = map[PostModelField.content];
     this.title = map[PostModelField.title];
     this.likesCount = map[PostModelField.likesCount];
@@ -49,4 +50,5 @@ class PostModelField {
   static const createdAt = "createdAt";
   static const updatedAt = "updatedAt";
   static const portfolioUrl = "portfolioUrl";
+  static const programmingLanguage = "programmingLanguage";
 }

@@ -32,5 +32,8 @@ class UserDao {
   void updateUserInfo(UserModel userModel) {}
 
 // ユーザー情報取得
-  void getUserInfo() {}
+  Future<DocumentSnapshot> getUserInfo(String userId) async {
+    DocumentSnapshot doc = await fs.document(userId).get();
+    return doc;
+  }
 }
