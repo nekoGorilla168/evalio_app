@@ -17,7 +17,7 @@ class PostsDao {
   // 最新順取得
   Future<List<DocumentSnapshot>> getNewPostsList() async {
     QuerySnapshot qs = await fs
-        .orderBy("createdAt", descending: false)
+        .orderBy("createdAt", descending: true)
         .limit(maxKensu)
         .getDocuments();
     return qs.documents;
