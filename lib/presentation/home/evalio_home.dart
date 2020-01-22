@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class Home extends StatelessWidget {
+  // ユーザーID
   final String id;
 
   // オプショナルコンストラクタ
@@ -34,20 +35,22 @@ class Home extends StatelessWidget {
   ];
 
   // 画面に応じたボタンを返す
-  Widget _returnFloatingActBtn(int gamenIndex) {
+  Widget _returnFloatingActBtn(int gamenIndex, BuildContext context) {
     switch (gamenIndex) {
-      case 0:
+      case 0: // 一覧画面
         return Column(
           verticalDirection: VerticalDirection.up,
           children: <Widget>[
             Container(
-              margin: EdgeInsets.only(top: 10.0, bottom: 50.0),
+              margin: EdgeInsets.only(top: 10.0),
               child: FloatingActionButton(
-                onPressed: () {},
+                heroTag: "heroTag1",
                 child: Icon(Icons.add),
+                onPressed: () => Navigator.of(context).pushNamed("/editor"),
               ),
             ),
             FloatingActionButton(
+              heroTag: "heroTag2",
               onPressed: () {},
               child: Icon(Icons.update),
             )
@@ -81,37 +84,11 @@ class Home extends StatelessWidget {
       _ctrlUser.getUserInfo(id);
     }
 
-//    final List<Widget> _floatingButtons = [
-//      Container(
-//        margin: EdgeInsets.only(top: 10.0),
-//        child: FloatingActionButton(
-//          onPressed: () {},
-//          child: Icon(Icons.add),
-//        ),
-//      ),
-//      FloatingActionButton(
-//        onPressed: () {},
-//        child: Icon(Icons.update),
-//      )
-//    ];
-
     return Scaffold(
       appBar: _appBarList.elementAt(_ctrlIndex.getCurIndex),
       body: IndexedStack(index: _ctrlIndex.getCurIndex, children: _pageWidgets),
-      floatingActionButton: _returnFloatingActBtn(_ctrlIndex.getCurIndex),
-//          _ctrlIndex.getCurIndex == 0 || _ctrlIndex.getCurIndex == 1
-//              ? Column(
-//                  verticalDirection: VerticalDirection.up,
-//                  children: _ctrlIndex.getCurIndex == 0
-//                      ? _floatingButtons
-//                      : <Widget>[
-//                          FloatingActionButton(
-//                            onPressed: () {},
-//                            child: Icon(Icons.mode_edit),
-//                          )
-//                        ],
-//                )
-//              : null,
+      floatingActionButton:
+          _returnFloatingActBtn(_ctrlIndex.getCurIndex, context),
       bottomNavigationBar: BottomNavibarConst(),
     );
   }

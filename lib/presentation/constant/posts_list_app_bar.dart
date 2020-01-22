@@ -29,17 +29,22 @@ class PostsListAppBar extends StatelessWidget with PreferredSizeWidget {
                     imageUrl: snapshot.data.photoUrl,
                     imageBuilder: (context, imgProvider) => Container(
                       width: 60,
-                      height: 20,
+                      height: 60,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         image: DecorationImage(
                           image: imgProvider,
-                          fit: BoxFit.fill,
+                          fit: BoxFit.contain,
                         ),
                       ),
                     ),
                     placeholder: (context, url) => CircularProgressIndicator(),
-                    errorWidget: (context, url, error) => Icon(Icons.error),
+                    errorWidget: (context, url, error) {
+                      return Tooltip(
+                        message: '画像が読み込めません',
+                        child: Icon(Icons.error_outline),
+                      );
+                    },
                   ),
                   Padding(
                     padding: EdgeInsets.only(left: 10),

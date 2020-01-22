@@ -3,6 +3,7 @@ import 'package:evalio_app/blocs/display_post_list_bloc.dart';
 import 'package:evalio_app/blocs/posts_bloc.dart';
 import 'package:evalio_app/models/posts_model.dart';
 import 'package:evalio_app/models/test.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
@@ -28,10 +29,11 @@ class PostsList extends StatelessWidget {
                   child: Container(
                     decoration: BoxDecoration(
                       border: Border(
-                          bottom: BorderSide(
-                              color: _streamCtrl.getISTrend
-                                  ? Colors.green
-                                  : Colors.grey.shade300)),
+                        bottom: BorderSide(
+                            color: _streamCtrl.getISTrend
+                                ? Colors.green
+                                : Colors.grey.shade300),
+                      ),
                     ),
                     child: Row(
                       children: <Widget>[
@@ -43,7 +45,12 @@ class PostsList extends StatelessWidget {
                                 : Colors.grey,
                           ),
                         ),
-                        Text('トレンド'),
+                        Text(
+                          'トレンド',
+                          style: _streamCtrl.getISTrend
+                              ? TextStyle(fontSize: 17)
+                              : null,
+                        ),
                       ],
                     ),
                   ),
@@ -74,7 +81,12 @@ class PostsList extends StatelessWidget {
                                 : Colors.grey,
                           ),
                         ),
-                        Text('最新'),
+                        Text(
+                          '最新',
+                          style: _streamCtrl.getIsNew
+                              ? TextStyle(fontSize: 17)
+                              : null,
+                        ),
                       ],
                     ),
                   ),
@@ -105,7 +117,8 @@ class BuildTrendList extends StatelessWidget {
   Widget build(BuildContext context) {
     final _postsCtrl = Provider.of<PostsBloc>(context);
     // 日付のフォーマット(yyyyMMdd)
-    final _format = DateFormat.yMd();
+    initializeDateFormatting('ja_JP');
+    final _format = DateFormat("yyyyMMdd", "ja_JP");
 
     return Container(
       child: StreamBuilder(
@@ -133,22 +146,24 @@ class BuildNewList extends StatelessWidget {
     final _postsCtrl = Provider.of<PostsBloc>(context);
     // 日付のフォーマット(yyyyMMdd)
     initializeDateFormatting('ja_JP');
-    final _format = DateFormat("yyyy-mm-dd", "ja_JP");
+    final _format = DateFormat("yyyyMMdd", "ja_JP");
 
     return Container(
-        child: StreamBuilder(
-            stream: _postsCtrl.newPostsList,
-            builder: (context, AsyncSnapshot snapshot) {
-              return snapshot.hasData
-                  ? ListView.builder(
-                      itemCount: snapshot.data.length,
-                      itemBuilder: (context, int index) {
-                        return createPostCard(snapshot.data[index], _format);
-                      })
-                  : Center(
-                      child: CircularProgressIndicator(),
-                    );
-            }));
+      child: StreamBuilder(
+        stream: _postsCtrl.newPostsList,
+        builder: (context, AsyncSnapshot snapshot) {
+          return snapshot.hasData
+              ? ListView.builder(
+                  itemCount: snapshot.data.length,
+                  itemBuilder: (context, int index) {
+                    return createPostCard(snapshot.data[index], _format);
+                  })
+              : Center(
+                  child: CircularProgressIndicator(),
+                );
+        },
+      ),
+    );
   }
 }
 
@@ -170,6 +185,82 @@ List<Widget> createChipList(List<String> programmingLanguage) {
   return _chipList;
 }
 
+// 投稿されたポートフォリオが現在の日付から何日前の投稿かを計算する
+String postedTime(String date) {
+  // 今日と投稿日を取得
+  var today = DateTime.now();
+  var createdAt = DateTime.parse(date);
+  // 差分を取得
+  var isDiffTime = today.difference(createdAt);
+
+  // 差分により表記が変わる
+  if (isDiffTime.inDays != 0) {
+    if (isDiffTime.inDays > 30) {
+      // 日付のフォーマット(yyyyMMdd)
+      initializeDateFormatting('ja_JP');
+      final _format = DateFormat("yyyy/MM/dd", "ja_JP");
+      return _format.format(createdAt);
+    } else {
+      return "${isDiffTime.inDays} days ago";
+    }
+  } else if (isDiffTime.inHours != 0) {
+    return "${isDiffTime.inHours} hours ago";
+  } else {
+    return "${isDiffTime.inMinutes} minutes ago";
+  }
+}
+
+// 投稿者名・写真を返す
+Widget returnAuthorNmPhoto(String userName, [String photoUrl]) {
+  return Container(
+    child: Expanded(
+      child: Row(
+        children: <Widget>[
+          Padding(
+            padding: EdgeInsets.only(top: 3.8, left: 3.8),
+            child: CircleAvatar(),
+          ),
+          Padding(
+            padding: EdgeInsets.only(left: 3.8),
+            child: Text(userName),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+// 現在から投稿日までの経過時間を表示するウィジェット
+Widget returnPostedDateTime(DateTime createdAt, DateFormat format) {
+  return Container(
+    padding: EdgeInsets.only(right: 10.0),
+    child: Row(
+      children: <Widget>[
+        Container(
+          child: Text(
+            postedTime(format.format(createdAt)),
+            style: TextStyle(fontSize: 12.0, color: Colors.grey.shade600),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+// お気に入りにされた数によって太さを変える
+TextStyle likesCountText(int likesCount) {
+  TextStyle _style;
+
+  if (likesCount < 10) {
+    _style = TextStyle(fontWeight: FontWeight.w300);
+  } else if (likesCount < 100) {
+    _style = TextStyle(fontWeight: FontWeight.w400);
+  } else {
+    _style = TextStyle(fontWeight: FontWeight.w700);
+  }
+  return _style;
+}
+
 // トレンド・最新共通
 // 投稿リストを生成
 Widget createPostCard(PostModel post, DateFormat format) {
@@ -177,6 +268,12 @@ Widget createPostCard(PostModel post, DateFormat format) {
     elevation: 5,
     child: Column(
       children: <Widget>[
+        Row(
+          children: <Widget>[
+            returnAuthorNmPhoto(post.title),
+            returnPostedDateTime(post.createdAt, format),
+          ],
+        ),
         Row(children: createChipList(post.programmingLanguage.cast<String>())),
         Container(
           color: Colors.deepOrange,
@@ -190,9 +287,17 @@ Widget createPostCard(PostModel post, DateFormat format) {
             fit: BoxFit.contain,
           ),
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: <Widget>[Text('投稿日  ' + format.format(post.createdAt))],
+        Divider(
+          color: Colors.grey.shade300,
+        ),
+        Text(
+          post.title,
+          style: TextStyle(fontSize: 22),
+        ),
+        Text(
+          post.content["theme"],
+          maxLines: 3,
+          overflow: TextOverflow.ellipsis,
         ),
         Divider(
           color: Colors.grey.shade300,
@@ -200,37 +305,35 @@ Widget createPostCard(PostModel post, DateFormat format) {
         Row(
           children: <Widget>[
             Container(
-              child: Row(
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.only(left: 3.8),
-                    child: CircleAvatar(),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(left: 3.8),
-                    child: Text(post.title),
-                  )
-                ],
+              child: Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.only(right: 0.0),
+                      child: Text(
+                        '${post.likesCount} Likes!',
+                        style: likesCountText(post.likesCount),
+                      ),
+                    ),
+                    IconButton(
+//                    color: Colors.yellow,
+                      splashColor: Colors.yellowAccent,
+                      icon: Icon(Icons.star_border),
+                      onPressed: () {},
+                    ),
+                    IconButton(
+                        splashColor: Colors.lightBlueAccent.shade100,
+                        icon: Icon(Icons.share),
+                        onPressed: () {}),
+                    IconButton(
+                        splashColor: Colors.red.shade300,
+                        icon: Icon(Icons.mood_bad),
+                        onPressed: () {})
+                  ],
+                ),
               ),
             ),
-            Container(
-                child: Expanded(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.only(right: 0.0),
-                    child: Text('${post.likesCount}'),
-                  ),
-                  IconButton(
-//                    color: Colors.yellow,
-                    splashColor: Colors.yellowAccent,
-                    icon: Icon(Icons.star_border),
-                    onPressed: () {},
-                  )
-                ],
-              ),
-            )),
           ],
         )
       ],

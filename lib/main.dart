@@ -1,11 +1,14 @@
 import 'package:evalio_app/blocs/bottom-navibar-bloc.dart';
 import 'package:evalio_app/blocs/display_post_list_bloc.dart';
+import 'package:evalio_app/blocs/markdown_bloc.dart';
 import 'package:evalio_app/blocs/posts_bloc.dart';
 import 'package:evalio_app/blocs/user-bloc.dart';
+import 'package:evalio_app/presentation/editor/markdown_editor.dart';
 import 'package:evalio_app/presentation/home/evalio_home.dart';
 import 'package:evalio_app/presentation/login/login.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -39,6 +42,9 @@ class EvalioApp extends StatelessWidget {
         ChangeNotifierProvider<DisplayPostsListBloc>(
           create: (_) => DisplayPostsListBloc(),
         ),
+        ChangeNotifierProvider<MarkDownBloc>(
+          create: (_) => MarkDownBloc(),
+        ),
         // ユーザー情報プロバイダ
         Provider<UserBloc>(
           create: (_) => UserBloc(),
@@ -51,6 +57,13 @@ class EvalioApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
+        localizationsDelegates: [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        supportedLocales: [
+          Locale('ja', ''),
+        ],
         theme: ThemeData(
           brightness: Brightness.light,
           primaryColor: Colors.white,
@@ -60,6 +73,7 @@ class EvalioApp extends StatelessWidget {
         routes: {
           '/loggedIn': (context) => LoggedIn(),
           '/home': (context) => Home(userInfo),
+          '/editor': (context) => DescriptionPortfolioEditor(),
         },
       ),
     );
