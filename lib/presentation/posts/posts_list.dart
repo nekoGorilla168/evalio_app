@@ -1,8 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:evalio_app/blocs/display_post_list_bloc.dart';
 import 'package:evalio_app/blocs/posts_bloc.dart';
+import 'package:evalio_app/models/const_programming_language_model.dart';
 import 'package:evalio_app/models/posts_model.dart';
-import 'package:evalio_app/models/test.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -122,7 +122,7 @@ class BuildTrendList extends StatelessWidget {
 
     return Container(
       child: StreamBuilder(
-        stream: _postsCtrl.getPostsList,
+        stream: _postsCtrl.getTrendPosts,
         builder: (context, AsyncSnapshot snapshot) {
           return (snapshot.hasData)
               ? ListView.builder(
@@ -150,7 +150,7 @@ class BuildNewList extends StatelessWidget {
 
     return Container(
       child: StreamBuilder(
-        stream: _postsCtrl.newPostsList,
+        stream: _postsCtrl.getNewPosts,
         builder: (context, AsyncSnapshot snapshot) {
           return snapshot.hasData
               ? ListView.builder(
@@ -263,18 +263,23 @@ TextStyle likesCountText(int likesCount) {
 
 // トレンド・最新共通
 // 投稿リストを生成
-Widget createPostCard(PostModel post, DateFormat format) {
+Widget createPostCard(PostModelDoc postDoc, DateFormat format) {
   return Card(
     elevation: 5,
     child: Column(
       children: <Widget>[
         Row(
           children: <Widget>[
-            returnAuthorNmPhoto(post.title),
-            returnPostedDateTime(post.createdAt, format),
+            returnAuthorNmPhoto(postDoc.postModel.title),
+            returnPostedDateTime(postDoc.postModel.createdAt, format),
           ],
         ),
-        Row(children: createChipList(post.programmingLanguage.cast<String>())),
+        Wrap(
+          runSpacing: 2.0,
+          alignment: WrapAlignment.start,
+          children: createChipList(
+              postDoc.postModel.programmingLanguage.cast<String>()),
+        ),
         Container(
           color: Colors.deepOrange,
           width: 360,
@@ -290,14 +295,28 @@ Widget createPostCard(PostModel post, DateFormat format) {
         Divider(
           color: Colors.grey.shade300,
         ),
-        Text(
-          post.title,
-          style: TextStyle(fontSize: 22),
-        ),
-        Text(
-          post.content["theme"],
-          maxLines: 3,
-          overflow: TextOverflow.ellipsis,
+        InkWell(
+          splashColor: Colors.lightBlueAccent.shade100,
+          onTap: () {},
+          child: Container(
+            width: 360,
+            child: Column(
+              children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: Text(
+                    postDoc.postModel.title,
+                    style: TextStyle(fontSize: 22),
+                  ),
+                ),
+                Text(
+                  postDoc.postModel.content["theme"],
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
         ),
         Divider(
           color: Colors.grey.shade300,
@@ -312,8 +331,8 @@ Widget createPostCard(PostModel post, DateFormat format) {
                     Padding(
                       padding: EdgeInsets.only(right: 0.0),
                       child: Text(
-                        '${post.likesCount} Likes!',
-                        style: likesCountText(post.likesCount),
+                        '${postDoc.postModel.likesCount} Likes!',
+                        style: likesCountText(postDoc.postModel.likesCount),
                       ),
                     ),
                     IconButton(

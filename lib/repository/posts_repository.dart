@@ -6,11 +6,14 @@ class PostsRepositpry {
   final _postDao = PostsDao();
 
   // トレンド
-  Future<List<PostModel>> getTrendPosts() async {
+  Future<List<PostModelDoc>> getTrendPosts() async {
     List<DocumentSnapshot> _docs = await _postDao.getTrendPostsList();
-    List<PostModel> posts;
+    List<PostModelDoc> posts;
     if (_docs != null) {
-      posts = _docs.map((doc) => PostModel.fromMap(doc.data)).toList();
+      posts = _docs
+          .map((doc) =>
+              PostModelDoc(doc.documentID, PostModel.fromMap(doc.data)))
+          .toList();
       return posts;
     } else {
       return posts;
@@ -18,11 +21,14 @@ class PostsRepositpry {
   }
 
   // 最新
-  Future<List<PostModel>> getNewPosts() async {
+  Future<List<PostModelDoc>> getNewPosts() async {
     List<DocumentSnapshot> _docs = await _postDao.getNewPostsList();
-    List<PostModel> posts;
+    List<PostModelDoc> posts;
     if (_docs != null) {
-      posts = _docs.map((doc) => PostModel.fromMap(doc.data)).toList();
+      posts = _docs
+          .map((doc) =>
+              PostModelDoc(doc.documentID, PostModel.fromMap(doc.data)))
+          .toList();
       return posts;
     } else {
       return posts;
