@@ -24,6 +24,7 @@ dependencies:
   firebase_core: ^0.4.0  # Firebase Core
   cloud_firestore: ^0.13.0+1 # Cloud Firestore
   firebase_auth: ^0.15.3 # Firebase Auth
+  firebase_storage: ^3.1.1 #Firebase Storage
 
   flutter_twitter: ^1.1.3 # Twitter Plugin
   flutter_dotenv: ^2.1.0  # Flutter DotEnv
@@ -36,6 +37,7 @@ dependencies:
   flutter_share_me: ^0.9.1 # Twitter ShareMe
   intl: ^0.16.0 # DateTime Format
   flutter_markdown: ^0.3.2  # Markdown Editor
+  image_picker: ^0.6.3+1 # Image Picker
 
 dev_dependencies:
   flutter_test:

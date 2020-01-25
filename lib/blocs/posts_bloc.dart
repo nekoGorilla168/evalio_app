@@ -7,12 +7,16 @@ class PostsBloc {
   // 投稿リストリポジトリ
   final _postRepository = PostsRepositpry();
 
-  // いいね順
-  final _trendPostsController = StreamController<List<PostModel>>.broadcast();
-  Stream<List<PostModel>> get getPostsList => _trendPostsController.stream;
+  // いいね
+  final _trendPostsController =
+      StreamController<List<PostModelDoc>>.broadcast();
+  Stream<List<PostModelDoc>> get getTrendPosts => _trendPostsController.stream;
   // 最新順
-  final _newPostsController = StreamController<List<PostModel>>.broadcast();
-  Stream<List<PostModel>> get newPostsList => _newPostsController.stream;
+  final _newPostsController = StreamController<List<PostModelDoc>>.broadcast();
+  Stream<List<PostModelDoc>> get getNewPosts => _newPostsController.stream;
+
+  // 投稿クラス
+  PostModelDoc _postModelDoc;
 
   // コンストラクタ
   PostsBloc() {
@@ -20,15 +24,25 @@ class PostsBloc {
     getNewPostsList();
   }
 
+  // 自分が投稿したポートフォリオを取得
+  void getMyPortfolio() async {}
+
+  //　トレンド取得
   void getTrendPostsList() async {
-    List<PostModel> _postModel = await _postRepository.getTrendPosts();
-    _trendPostsController.sink.add(_postModel);
+    List<PostModelDoc> _postModelDoc = await _postRepository.getTrendPosts();
+    _trendPostsController.sink.add(_postModelDoc);
   }
 
+  // 最新リスト取得
   void getNewPostsList() async {
-    List<PostModel> _postModel = await _postRepository.getNewPosts();
-    _newPostsController.sink.add(_postModel);
+    List<PostModelDoc> _postModelDoc = await _postRepository.getNewPosts();
+    _newPostsController.sink.add(_postModelDoc);
   }
+
+  void insertPost() {}
+
+  // 投稿用のデータを確保する
+  void setPostDate() {}
 
   void dispose() {
     _trendPostsController.close();

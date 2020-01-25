@@ -19,12 +19,12 @@ class UserDao {
   // ユーザー情報新規登録
   insertUserInfo(UserModel userModel) {
     fs.document(userModel.userId).setData({
-      "userName": userModel.userName,
-      "photoUrl": userModel.photoUrl,
+      UserModelField.userName: userModel.userName,
+      UserModelField.photoUrl: userModel.photoUrl,
       "profile": {"interest": null, "selfIntroducation": null},
       "likedPosts": [],
       "post": null,
-      "createdAt": new DateTime.now()
+      UserModelField.createdAt: new DateTime.now()
     });
   }
 

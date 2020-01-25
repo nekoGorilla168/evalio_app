@@ -2,6 +2,16 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+// ポートフォリオIDとフィールドのクラス
+class PostModelDoc {
+  String postId; // 投稿者id
+  PostModel postModel; // フィールド
+
+  // コンストラクタ
+  PostModelDoc(this.postId, this.postModel);
+}
+
+// フィールドのデータ構造クラス
 class PostModel {
   String postId; // ポートフォリオID
   String postUserId; // 投稿者ID
@@ -14,6 +24,8 @@ class PostModel {
   DateTime updatedAt; // 更新日
   //UserModel userModel; // 投稿したユーザーのモデルクラス
   Map content; // 投稿内容
+  String overview;
+  String details;
 
   // コンストラクタ
   PostModel();
@@ -43,12 +55,16 @@ class PostModel {
 // FireStoreのフィールド名
 class PostModelField {
   static const postId = "postId";
-  static const postUserId = "postUserIdRef";
+  static const postUserIdRef = "postUserIdRef";
   static const content = "content";
   static const title = "title";
+  static const overview = "overview";
+  static const details = "details";
+  static const portfolioUrl = "portfolioUrl";
+  static const portfolioPhotoData = "portfolioPhotoData";
   static const likesCount = "likesCount";
   static const createdAt = "createdAt";
   static const updatedAt = "updatedAt";
-  static const portfolioUrl = "portfolioUrl";
+
   static const programmingLanguage = "programmingLanguage";
 }
