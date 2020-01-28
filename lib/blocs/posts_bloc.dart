@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:evalio_app/models/posts_model.dart';
 import 'package:evalio_app/repository/posts_repository.dart';
@@ -30,18 +31,31 @@ class PostsBloc {
   //　トレンド取得
   void getTrendPostsList() async {
     List<PostModelDoc> _postModelDoc = await _postRepository.getTrendPosts();
-    _trendPostsController.sink.add(_postModelDoc);
+    if (_postModelDoc != null) _trendPostsController.sink.add(_postModelDoc);
   }
 
   // 最新リスト取得
   void getNewPostsList() async {
     List<PostModelDoc> _postModelDoc = await _postRepository.getNewPosts();
-    _newPostsController.sink.add(_postModelDoc);
+    if (_postModelDoc != null) _newPostsController.sink.add(_postModelDoc);
   }
 
-  void insertPost() {}
-
   // 投稿用のデータを確保する
+
+  // ポートフォリオを登録
+  void addPostData(
+    String title,
+    List<String> langNames,
+    File file,
+    String portfolioUrl,
+    String overview,
+    String details,
+    String userId,
+  ) {
+    _postRepository.addPortfolio(
+        title, langNames, file, portfolioUrl, overview, details, userId);
+  }
+
   void setPostDate() {}
 
   void dispose() {

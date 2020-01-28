@@ -38,6 +38,8 @@ dependencies:
   intl: ^0.16.0 # DateTime Format
   flutter_markdown: ^0.3.2  # Markdown Editor
   image_picker: ^0.6.3+1 # Image Picker
+  url_launcher: ^5.4.1  # URL Launcher
+  uuid: ^2.0.4  # UUID
 
 dev_dependencies:
   flutter_test:

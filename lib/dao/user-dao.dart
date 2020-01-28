@@ -3,13 +3,13 @@ import 'package:evalio_app/models/user_model.dart';
 
 class UserDao {
   // ルートコレクション
-  var fs = Firestore.instance.collection("users");
+  final fsUser = Firestore.instance.collection("users");
 
   // ユーザー登録状態チェック
   Future<bool> checkRegisteredUser(String id) async {
     bool isExist = false;
 
-    DocumentSnapshot doc = await fs.document(id).get();
+    DocumentSnapshot doc = await fsUser.document(id).get();
     if (doc.data.length != 0) {
       isExist = true;
     }
@@ -18,7 +18,7 @@ class UserDao {
 
   // ユーザー情報新規登録
   insertUserInfo(UserModel userModel) {
-    fs.document(userModel.userId).setData({
+    fsUser.document(userModel.userId).setData({
       UserModelField.userName: userModel.userName,
       UserModelField.photoUrl: userModel.photoUrl,
       "profile": {"interest": null, "selfIntroducation": null},
@@ -33,7 +33,7 @@ class UserDao {
 
 // ユーザー情報取得
   Future<DocumentSnapshot> getUserInfo(String userId) async {
-    DocumentSnapshot doc = await fs.document(userId).get();
+    DocumentSnapshot doc = await fsUser.document(userId).get();
     return doc;
   }
 }

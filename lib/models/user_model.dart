@@ -1,3 +1,14 @@
+// ユーザー情報データ構造
+import 'package:evalio_app/models/posts_model.dart';
+
+class UserModelDoc {
+  String userId;
+  UserModel userModel;
+  PostModelDoc postModelDoc;
+  // コンストラクタ(ポートフォリオ未投稿ならPostModelDocはインスタンス化しない)
+  UserModelDoc(this.userId, this.userModel, [this.postModelDoc]);
+}
+
 // ユーザー情報クラス
 class UserModel {
   String userId; // ユーザーID
@@ -21,6 +32,12 @@ class UserModel {
     this.photoUrl = map[UserModelField.photoUrl];
   }
 
+  //
+  UserModel.fromFire(Map map) {
+    this.userName = map[UserModelField.userName];
+    this.photoUrl = map[UserModelField.photoUrl];
+  }
+
   // Firestore登録時変換用
   Map<String, Object> toMap() {
     return {
@@ -33,6 +50,7 @@ class UserModel {
   }
 }
 
+// フィールド名クラス
 class UserModelField {
   static const userId = "userId";
   static const userName = "userName";

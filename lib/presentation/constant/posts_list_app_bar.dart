@@ -16,7 +16,7 @@ class PostsListAppBar extends StatelessWidget with PreferredSizeWidget {
 
     print('Buid ConstAppBar');
     return SafeArea(
-        child: StreamBuilder<UserModel>(
+        child: StreamBuilder<UserModelDoc>(
             stream: _ctrlUser.getUser,
             builder: (context, snapshot) {
               if (snapshot.data == null) return _loadingAppBar();
@@ -26,7 +26,7 @@ class PostsListAppBar extends StatelessWidget with PreferredSizeWidget {
                 centerTitle: true,
                 actions: <Widget>[
                   CachedNetworkImage(
-                    imageUrl: snapshot.data.photoUrl,
+                    imageUrl: snapshot.data.userModel.photoUrl,
                     imageBuilder: (context, imgProvider) => Container(
                       width: 60,
                       height: 60,
