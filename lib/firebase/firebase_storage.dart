@@ -2,10 +2,11 @@ import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
 
-class FirebaseStorageFactory {
-  Future<String> uploadImage(File file) async {
+// FirebaseStorqageを使用するクラス
+class FireStorage {
+  Future<String> uploadImage(File file, String userId) async {
     int timestamp = DateTime.now().millisecondsSinceEpoch;
-    String subDirectoryName = 'test';
+    String subDirectoryName = userId;
     final StorageReference ref =
         FirebaseStorage().ref().child(subDirectoryName).child('${timestamp}');
 

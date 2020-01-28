@@ -3,6 +3,7 @@ import 'package:evalio_app/blocs/display_post_list_bloc.dart';
 import 'package:evalio_app/blocs/markdown_bloc.dart';
 import 'package:evalio_app/blocs/posts_bloc.dart';
 import 'package:evalio_app/blocs/user-bloc.dart';
+import 'package:evalio_app/presentation/constant/portfolio_details.dart';
 import 'package:evalio_app/presentation/editor/markdown_editor.dart';
 import 'package:evalio_app/presentation/home/evalio_home.dart';
 import 'package:evalio_app/presentation/login/login.dart';
@@ -74,6 +75,7 @@ class EvalioApp extends StatelessWidget {
           '/loggedIn': (context) => LoggedIn(),
           '/home': (context) => Home(userInfo),
           '/editor': (context) => DescriptionPortfolioEditor(),
+          '/test': (context) => PortfolioDetails(),
         },
       ),
     );

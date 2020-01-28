@@ -82,6 +82,7 @@ class Home extends StatelessWidget {
     final _ctrlUser = Provider.of<UserBloc>(context);
     if (id != null) {
       _ctrlUser.getUserInfo(id);
+      _ctrlUser.setUserId(id);
     }
 
     return Scaffold(

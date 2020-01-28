@@ -19,6 +19,10 @@ class MarkDownBloc with ChangeNotifier {
   File _image;
   File get getImage => _image;
 
+  // ポートフォリオサイトのURL
+  String _portfolioUrl = "";
+  String get getUrl => _portfolioUrl;
+
   // フィルターチップの選択されたチップリスト
   List<String> _filters = <String>[];
   List<String> get getFilters => _filters;
@@ -44,6 +48,12 @@ class MarkDownBloc with ChangeNotifier {
   // ストレージ内の写真を保持する
   void setPhoto(File image) {
     _image = image;
+    notifyListeners();
+  }
+
+  // ポートフォリオサイトのURLを追加する
+  void setUrl(String url) {
+    _portfolioUrl = url;
     notifyListeners();
   }
 

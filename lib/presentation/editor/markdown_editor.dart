@@ -1,18 +1,23 @@
 import 'package:evalio_app/blocs/markdown_bloc.dart';
 import 'package:evalio_app/blocs/posts_bloc.dart';
+import 'package:evalio_app/blocs/user-bloc.dart';
 import 'package:evalio_app/models/const_programming_language_model.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class DescriptionPortfolioEditor extends StatelessWidget {
   final GlobalKey<ScaffoldState> _key = GlobalKey<ScaffoldState>();
+  final TextEditingController _textCntrl = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     final _markdownCtrl = Provider.of<MarkDownBloc>(context);
     final _postCtrl = Provider.of<PostsBloc>(context);
+    final _userCtrl = Provider.of<UserBloc>(context);
 
     // フィルターチップのリストを返す
     List<Widget> _getFilterChipList() {
@@ -47,6 +52,7 @@ class DescriptionPortfolioEditor extends StatelessWidget {
           keyboardType: TextInputType.multiline,
           minLines: 1,
           maxLines: 2,
+          maxLength: 30,
           decoration: InputDecoration(
               hintMaxLines: 30,
               border: UnderlineInputBorder(),
@@ -70,7 +76,13 @@ class DescriptionPortfolioEditor extends StatelessWidget {
         child: Container(
           height: 100,
           child: Row(
-            children: <Widget>[Icon(Icons.photo), Text('+写真を選択する')],
+            children: <Widget>[
+              Icon(Icons.photo),
+              Text(
+                '+写真を選択する',
+                style: TextStyle(color: Colors.blueAccent),
+              ),
+            ],
           ),
         ),
       );
@@ -93,15 +105,8 @@ class DescriptionPortfolioEditor extends StatelessWidget {
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey),
                 ),
-                child: GestureDetector(
-                  onTap: () async {
-                    var image = await ImagePicker.pickImage(
-                        source: ImageSource.gallery);
-                    _markdownCtrl.setPhoto(image);
-                  },
-                  child: Center(
-                    child: Text('サムネイルとなる写真を投稿してみよう'),
-                  ),
+                child: Center(
+                  child: Text('サムネイルとなる写真を投稿してみよう'),
                 ),
               ),
       );
@@ -184,14 +189,28 @@ class DescriptionPortfolioEditor extends StatelessWidget {
                         Divider(
                           color: Colors.grey,
                         ),
-                        _photoFromLocalStorage(),
-                        _displayPhotoField(),
+                        _photoFromLocalStorage(), // ギャラリーからイメージを選択する
+                        _displayPhotoField(), // 選択したイメージを表示するエリア
                         Container(
                           height: 100,
+                          child: TextFormField(
+                            decoration: InputDecoration(
+                              border: UnderlineInputBorder(),
+                              icon: Icon(Icons.web),
+                              labelText: 'あなたのポートフォリオのサイトURL',
+                            ),
+                            onChanged: (String portfolioUrl) {
+                              _markdownCtrl.setUrl(portfolioUrl);
+                            },
+                          ),
+                        ),
+                        Container(
+                          height: 200,
                           child: TextField(
                             keyboardType: TextInputType.multiline,
                             minLines: 1,
-                            maxLines: 3,
+                            maxLines: 5,
+                            maxLength: 100,
                             decoration: InputDecoration(
                                 border: UnderlineInputBorder(),
                                 icon: Icon(Icons.description),
@@ -227,72 +246,124 @@ class DescriptionPortfolioEditor extends StatelessWidget {
               Container(
                 padding: EdgeInsets.all(15.0),
                 child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
+                  child: Flex(
+                    direction: Axis.horizontal,
                     children: <Widget>[
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: <Widget>[
-                          FlatButton.icon(
-                            onPressed: () {
-                              if (_markdownCtrl.checkData() == false) {
-                                _key.currentState.showSnackBar(const SnackBar(
-                                    content: Text('未入力の項目があります。')));
-                              } else {
-                                showDialog(
-                                  context: context,
-                                  builder: (_) {
-                                    return AlertDialog(
-                                      title: Text('Confirmation'),
-                                      content:
-                                          Text('あなたのポートフォリオを投稿しますが本当によろしいですか？'),
-                                      actions: <Widget>[
-                                        FlatButton(
-                                          child: Text('Cancel'),
-                                          onPressed: () =>
-                                              Navigator.pop(context),
-                                        ),
-                                        FlatButton(
-                                          child: Text('OK'),
-                                          onPressed: () =>
-                                              Navigator.pop(context),
-                                        )
-                                      ],
-                                    );
+                      Expanded(
+                        child: Column(
+                          children: <Widget>[
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: <Widget>[
+                                FlatButton.icon(
+                                  onPressed: () {
+                                    if (_markdownCtrl.checkData() == false) {
+                                      _key.currentState.showSnackBar(
+                                          const SnackBar(
+                                              content: Text('未入力の項目があります。')));
+                                    } else {
+                                      showDialog(
+                                        context: context,
+                                        builder: (_) {
+                                          return AlertDialog(
+                                            title: Text('Confirmation'),
+                                            content: Text(
+                                                'あなたのポートフォリオを投稿しますが本当によろしいですか？'),
+                                            actions: <Widget>[
+                                              FlatButton(
+                                                child: Text('Cancel'),
+                                                onPressed: () =>
+                                                    Navigator.pop(context),
+                                              ),
+                                              FlatButton(
+                                                  child: Text('OK'),
+                                                  onPressed: () {
+                                                    // ポートフォリオ登録
+                                                    _postCtrl.addPostData(
+                                                        _markdownCtrl
+                                                            .getAppTitle,
+                                                        _markdownCtrl
+                                                            .getFilters,
+                                                        _markdownCtrl.getImage,
+                                                        _markdownCtrl.getUrl,
+                                                        _markdownCtrl
+                                                            .getAppOverView,
+                                                        _markdownCtrl
+                                                            .getMarkDownData,
+                                                        _userCtrl.getId);
+                                                    Navigator.pop(context);
+                                                  }),
+                                            ],
+                                          );
+                                        },
+                                      );
+                                    }
                                   },
-                                );
-                              }
-                            },
-                            icon: Icon(Icons.navigate_next),
-                            label: Text('投稿する'),
-                          ),
-                        ],
-                      ),
-                      _createKoumoku(_markdownCtrl.getAppTitle, 20),
-                      Padding(
-                        padding: EdgeInsets.only(top: 20.0, bottom: 20.0),
-                        child: Wrap(
-                          spacing: 8.0,
-                          runSpacing: 0.0,
-                          children: _displayChipList(_markdownCtrl.getFilters),
+                                  icon: Icon(Icons.navigate_next),
+                                  label: Text('投稿する'),
+                                ),
+                              ],
+                            ),
+                            _createKoumoku('タイトル', 14),
+                            Padding(
+                              padding: EdgeInsets.only(top: 20, bottom: 20),
+                              child:
+                                  _createKoumoku(_markdownCtrl.getAppTitle, 20),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(top: 10.0),
+                              child: Wrap(
+                                crossAxisAlignment: WrapCrossAlignment.start,
+                                spacing: 8.0,
+                                runSpacing: 0.0,
+                                children:
+                                    _displayChipList(_markdownCtrl.getFilters),
+                              ),
+                            ),
+                            _displayPhotoField(),
+                            Padding(
+                              padding: EdgeInsets.only(top: 10),
+                              child: _createKoumoku("ポートフォリオサイトURL", 14),
+                            ),
+                            GestureDetector(
+                              // ポートフォリオサイトを開く
+                              onTap: () async {
+                                var url = _markdownCtrl.getUrl;
+                                if (await canLaunch(url)) {
+                                  await launch(url);
+                                } else {
+                                  if (_markdownCtrl.getUrl != "")
+                                    _key.currentState.showSnackBar(const SnackBar(
+                                        content: Text(
+                                            'サイトにアクセスすることができません。URLが間違っている可能性があります。')));
+                                }
+                              },
+                              child: Container(
+                                width: MediaQuery.of(context).size.width,
+                                child: Text(_markdownCtrl.getUrl),
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(top: 20.0),
+                              child: _createKoumoku("アプリケーション概要", 14),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(top: 20.0),
+                              child: Text(_markdownCtrl.getAppOverView),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(top: 20.0, bottom: 20.0),
+                              child: _createKoumoku("アプリケーション詳細", 14),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(right: 250.0),
+                              child: Container(
+                                child: MarkdownBody(
+                                    data: _markdownCtrl.getMarkDownData),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                      _displayPhotoField(),
-                      Padding(
-                        padding: EdgeInsets.only(top: 20.0),
-                        child: _createKoumoku("アプリケーション概要", 14),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(top: 20.0),
-                        child: Text(_markdownCtrl.getAppOverView),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(top: 20.0, bottom: 20.0),
-                        child: _createKoumoku("アプリケーション詳細", 14),
-                      ),
-                      Container(
-                        child:
-                            MarkdownBody(data: _markdownCtrl.getMarkDownData),
                       ),
                     ],
                   ),

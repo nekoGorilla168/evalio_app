@@ -152,7 +152,7 @@ class BuildNewList extends StatelessWidget {
       child: StreamBuilder(
         stream: _postsCtrl.getNewPosts,
         builder: (context, AsyncSnapshot snapshot) {
-          return snapshot.hasData
+          return (snapshot.hasData)
               ? ListView.builder(
                   itemCount: snapshot.data.length,
                   itemBuilder: (context, int index) {
@@ -222,7 +222,15 @@ Widget returnAuthorNmPhoto(String userName, [String photoUrl]) {
           ),
           Padding(
             padding: EdgeInsets.only(left: 3.8),
-            child: Text(userName),
+            child: Container(
+              width: 200,
+              child: Text(
+                userName,
+                style: TextStyle(
+                  fontSize: 12.0,
+                ),
+              ),
+            ),
           ),
         ],
       ),
@@ -270,7 +278,7 @@ Widget createPostCard(PostModelDoc postDoc, DateFormat format) {
       children: <Widget>[
         Row(
           children: <Widget>[
-            returnAuthorNmPhoto(postDoc.postModel.title),
+            returnAuthorNmPhoto(postDoc.userModelDocRef.userModel.userName),
             returnPostedDateTime(postDoc.postModel.createdAt, format),
           ],
         ),
@@ -305,12 +313,12 @@ Widget createPostCard(PostModelDoc postDoc, DateFormat format) {
                 Padding(
                   padding: EdgeInsets.all(10.0),
                   child: Text(
-                    postDoc.postModel.title,
+                    postDoc.postModel.content[PostModelField.title],
                     style: TextStyle(fontSize: 22),
                   ),
                 ),
                 Text(
-                  postDoc.postModel.content["theme"],
+                  postDoc.postModel.content[PostModelField.overview],
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                 ),

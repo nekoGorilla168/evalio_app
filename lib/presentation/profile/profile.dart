@@ -9,7 +9,7 @@ class Profile extends StatelessWidget {
   Widget build(BuildContext context) {
     final _ctrlUser = Provider.of<UserBloc>(context);
 
-    return StreamBuilder<UserModel>(
+    return StreamBuilder<UserModelDoc>(
         stream: _ctrlUser.getUser,
         builder: (context, snapshot) {
           if (snapshot.data == null) {
@@ -36,6 +36,13 @@ class Profile extends StatelessWidget {
                     );
                   },
                   child: Text('Twitterで共有する'),
+                ),
+                FlatButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/test',
+                        arguments: _ctrlUser.getUserDoc);
+                  },
+                  child: Text('写真'),
                 )
               ],
             );
