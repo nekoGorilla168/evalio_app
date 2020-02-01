@@ -14,7 +14,8 @@ class UserModel {
   String userId; // ユーザーID
   String userName; // ユーザー名(Twitter DisplayName)
   String photoUrl; // ユーザーのプロフ写真URL
-  List likedPortfolio; // いいねしたポートフォリオ
+  List likedPost = []; // いいねしたポートフォリオ
+  Map profile;
   DateTime createdAt; // 作成日
   DateTime updatedAt; // 更新日
 
@@ -32,10 +33,12 @@ class UserModel {
     this.photoUrl = map[UserModelField.photoUrl];
   }
 
-  //
+  // 名前付きコンストラクタ
   UserModel.fromFire(Map map) {
     this.userName = map[UserModelField.userName];
     this.photoUrl = map[UserModelField.photoUrl];
+    this.likedPost = map[UserModelField.likedPost];
+    this.profile = map[UserModelField.profile];
   }
 
   // Firestore登録時変換用
@@ -44,7 +47,7 @@ class UserModel {
       UserModelField.userId: this.userId,
       UserModelField.userName: this.userName,
       UserModelField.photoUrl: this.photoUrl,
-      UserModelField.likedPortfolio: this.likedPortfolio,
+      UserModelField.likedPost: this.likedPost,
       UserModelField.updatedAt: this.updatedAt,
     };
   }
@@ -55,7 +58,10 @@ class UserModelField {
   static const userId = "userId";
   static const userName = "userName";
   static const photoUrl = "photoUrl";
-  static const likedPortfolio = "likedPortfolio";
+  static const profile = "profile";
+  static const selfIntroducation = "selfIntroducation";
+  static const interest = "interest";
+  static const likedPost = "likedPost";
   static const updatedAt = "updatedAt";
   static const createdAt = "createdAt";
   static const likedPortfolioIdList = "likedPortfolioIdList";

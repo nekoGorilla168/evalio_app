@@ -1,18 +1,24 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:evalio_app/blocs/display_post_list_bloc.dart';
 import 'package:evalio_app/blocs/posts_bloc.dart';
-import 'package:evalio_app/models/const_programming_language_model.dart';
+import 'package:evalio_app/blocs/user-bloc.dart';
 import 'package:evalio_app/models/posts_model.dart';
+import 'package:evalio_app/presentation/common/common.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class PostsList extends StatelessWidget {
+  final CommonProcessing common = CommonProcessing();
+
+  // 日付のフォーマット(yyyyMMdd)
+  final _format = DateFormat("yyyyMMdd", "ja_JP");
+
   @override
   Widget build(BuildContext context) {
     final _streamCtrl = Provider.of<DisplayPostsListBloc>(context);
+    final _postsCtrl = Provider.of<PostsBloc>(context);
 
     return Container(
       child: Column(
@@ -99,8 +105,12 @@ class PostsList extends StatelessWidget {
               child: IndexedStack(
                 index: _streamCtrl.getCurIndex,
                 children: <Widget>[
-                  BuildTrendList(),
-                  BuildNewList(),
+                  _postsCtrl.getPostTrendModelDoc == null
+                      ? CircularProgressIndicator()
+                      : _postList(_postsCtrl.getPostTrendModelDoc, context),
+                  _postsCtrl.getPostTrendModelDoc == null
+                      ? CircularProgressIndicator()
+                      : _postList(_postsCtrl.getPostNewModelDoc, context),
                 ],
               ),
             ),
@@ -109,104 +119,143 @@ class PostsList extends StatelessWidget {
       ),
     );
   }
-}
 
-// トレンド一覧を表示するクラス
-class BuildTrendList extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final _postsCtrl = Provider.of<PostsBloc>(context);
-    // 日付のフォーマット(yyyyMMdd)
-    initializeDateFormatting('ja_JP');
-    final _format = DateFormat("yyyyMMdd", "ja_JP");
+  // 最新かトレンドを表示するメソッド
+  Widget _postList(List<PostModelDoc> postList, BuildContext context) {
+    return postList == null
+        ? CircularProgressIndicator()
+        : Container(
+            child: ListView.builder(
+                itemCount: postList.length,
+                itemBuilder: (context, index) {
+                  return _createPostCard(postList[index], _format, context);
+                }),
+          );
+  }
 
-    return Container(
-      child: StreamBuilder(
-        stream: _postsCtrl.getTrendPosts,
-        builder: (context, AsyncSnapshot snapshot) {
-          return (snapshot.hasData)
-              ? ListView.builder(
-                  itemCount: snapshot.data.length,
-                  itemBuilder: (context, int index) {
-                    return createPostCard(snapshot.data[index], _format);
-                  })
-              : Center(
-                  child: CircularProgressIndicator(),
-                );
-        },
+  // カードを作成するメソッド
+  Widget _createPostCard(
+      PostModelDoc postDoc, DateFormat format, BuildContext context) {
+    final _postCtrl = Provider.of<PostsBloc>(context);
+    final _userCtrl = Provider.of<UserBloc>(context);
+
+    return Card(
+      elevation: 5,
+      child: Column(
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              returnAuthorNmPhoto(postDoc.userModelDocRef.userModel.userName),
+              _returnPostedDateTime(postDoc.postModel.createdAt, format),
+            ],
+          ),
+          Wrap(
+            runSpacing: 2.0,
+            spacing: -6.0,
+            alignment: WrapAlignment.start,
+            children: common.createChipList(
+                postDoc.postModel.content[PostModelField.programmingLanguage]
+                    .cast<String>(),
+                0.75),
+          ),
+          Container(
+            color: Colors.deepOrange,
+            width: 360,
+            height: 200,
+            child: CachedNetworkImage(
+              imageUrl:
+                  'https://1.bp.blogspot.com/-B54gNIK9aB8/Xbo7GUlkrKI/AAAAAAABVys/0cVBQjxSw4ovbd-LmFBuCOFYd74bNqTHACNcBGAsYHQ/s1600/figure_jump_happy.png',
+              placeholder: (context, url) => CircularProgressIndicator(),
+              errorWidget: (context, url, error) => Icon(Icons.error_outline),
+              fit: BoxFit.contain,
+            ),
+          ),
+          Divider(
+            color: Colors.grey.shade300,
+          ),
+          InkWell(
+            splashColor: Colors.lightBlueAccent.shade100,
+            onTap: () {},
+            child: Container(
+              width: 360,
+              child: Column(
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.all(10.0),
+                    child: Text(
+                      postDoc.postModel.content[PostModelField.title],
+                      style: TextStyle(fontSize: 22),
+                    ),
+                  ),
+                  Text(
+                    postDoc.postModel.content[PostModelField.overview],
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Divider(
+            color: Colors.grey.shade300,
+          ),
+          Row(
+            children: <Widget>[
+              Container(
+                child: Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.only(right: 0.0),
+                        child: Text(
+                          '${postDoc.postModel.likesCount} Likes!',
+                          style: likesCountText(postDoc.postModel.likesCount),
+                        ),
+                      ),
+                      IconButton(
+//                    color: Colors.yellow,
+                        splashColor: Colors.yellowAccent,
+                        icon: Icon(Icons.star_border),
+                        onPressed: () {
+                          _postCtrl.addLikesCount(
+                              postDoc.postId, _userCtrl.getId);
+                        },
+                      ),
+                      IconButton(
+                          splashColor: Colors.lightBlueAccent.shade100,
+                          icon: Icon(Icons.share),
+                          onPressed: () {}),
+                      IconButton(
+                          splashColor: Colors.red.shade300,
+                          icon: Icon(Icons.mood_bad),
+                          onPressed: () {})
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          )
+        ],
       ),
     );
   }
-}
 
-// 最新投稿リスト
-class BuildNewList extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final _postsCtrl = Provider.of<PostsBloc>(context);
-    // 日付のフォーマット(yyyyMMdd)
-    initializeDateFormatting('ja_JP');
-    final _format = DateFormat("yyyyMMdd", "ja_JP");
-
+  // 現在から投稿日までの経過時間を表示するウィジェット
+  Widget _returnPostedDateTime(DateTime createdAt, DateFormat format) {
     return Container(
-      child: StreamBuilder(
-        stream: _postsCtrl.getNewPosts,
-        builder: (context, AsyncSnapshot snapshot) {
-          return (snapshot.hasData)
-              ? ListView.builder(
-                  itemCount: snapshot.data.length,
-                  itemBuilder: (context, int index) {
-                    return createPostCard(snapshot.data[index], _format);
-                  })
-              : Center(
-                  child: CircularProgressIndicator(),
-                );
-        },
+      padding: EdgeInsets.only(right: 10.0),
+      child: Row(
+        children: <Widget>[
+          Container(
+            child: Text(
+              common.postedTime(format.format(createdAt), format),
+              style: TextStyle(fontSize: 12.0, color: Colors.grey.shade600),
+            ),
+          ),
+        ],
       ),
     );
-  }
-}
-
-// チップリストを返すウィジェット
-List<Widget> createChipList(List<String> programmingLanguage) {
-  List<Widget> _chipList = programmingLanguage.map((langKey) {
-    // 言語名を取得
-    String langName = ProgrammingLangMap.plMap[langKey];
-
-    return Transform.scale(
-      scale: 0.65,
-      child: Chip(
-        label: Text(langName),
-        backgroundColor: Colors.blueGrey.shade100,
-      ),
-    );
-  }).toList();
-
-  return _chipList;
-}
-
-// 投稿されたポートフォリオが現在の日付から何日前の投稿かを計算する
-String postedTime(String date) {
-  // 今日と投稿日を取得
-  var today = DateTime.now();
-  var createdAt = DateTime.parse(date);
-  // 差分を取得
-  var isDiffTime = today.difference(createdAt);
-
-  // 差分により表記が変わる
-  if (isDiffTime.inDays != 0) {
-    if (isDiffTime.inDays > 30) {
-      // 日付のフォーマット(yyyyMMdd)
-      initializeDateFormatting('ja_JP');
-      final _format = DateFormat("yyyy/MM/dd", "ja_JP");
-      return _format.format(createdAt);
-    } else {
-      return "${isDiffTime.inDays} days ago";
-    }
-  } else if (isDiffTime.inHours != 0) {
-    return "${isDiffTime.inHours} hours ago";
-  } else {
-    return "${isDiffTime.inMinutes} minutes ago";
   }
 }
 
@@ -238,23 +287,6 @@ Widget returnAuthorNmPhoto(String userName, [String photoUrl]) {
   );
 }
 
-// 現在から投稿日までの経過時間を表示するウィジェット
-Widget returnPostedDateTime(DateTime createdAt, DateFormat format) {
-  return Container(
-    padding: EdgeInsets.only(right: 10.0),
-    child: Row(
-      children: <Widget>[
-        Container(
-          child: Text(
-            postedTime(format.format(createdAt)),
-            style: TextStyle(fontSize: 12.0, color: Colors.grey.shade600),
-          ),
-        ),
-      ],
-    ),
-  );
-}
-
 // お気に入りにされた数によって太さを変える
 TextStyle likesCountText(int likesCount) {
   TextStyle _style;
@@ -267,103 +299,4 @@ TextStyle likesCountText(int likesCount) {
     _style = TextStyle(fontWeight: FontWeight.w700);
   }
   return _style;
-}
-
-// トレンド・最新共通
-// 投稿リストを生成
-Widget createPostCard(PostModelDoc postDoc, DateFormat format) {
-  return Card(
-    elevation: 5,
-    child: Column(
-      children: <Widget>[
-        Row(
-          children: <Widget>[
-            returnAuthorNmPhoto(postDoc.userModelDocRef.userModel.userName),
-            returnPostedDateTime(postDoc.postModel.createdAt, format),
-          ],
-        ),
-        Wrap(
-          runSpacing: 2.0,
-          alignment: WrapAlignment.start,
-          children: createChipList(
-              postDoc.postModel.programmingLanguage.cast<String>()),
-        ),
-        Container(
-          color: Colors.deepOrange,
-          width: 360,
-          height: 200,
-          child: CachedNetworkImage(
-            imageUrl:
-                'https://1.bp.blogspot.com/-B54gNIK9aB8/Xbo7GUlkrKI/AAAAAAABVys/0cVBQjxSw4ovbd-LmFBuCOFYd74bNqTHACNcBGAsYHQ/s1600/figure_jump_happy.png',
-            placeholder: (context, url) => CircularProgressIndicator(),
-            errorWidget: (context, url, error) => Icon(Icons.error_outline),
-            fit: BoxFit.contain,
-          ),
-        ),
-        Divider(
-          color: Colors.grey.shade300,
-        ),
-        InkWell(
-          splashColor: Colors.lightBlueAccent.shade100,
-          onTap: () {},
-          child: Container(
-            width: 360,
-            child: Column(
-              children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.all(10.0),
-                  child: Text(
-                    postDoc.postModel.content[PostModelField.title],
-                    style: TextStyle(fontSize: 22),
-                  ),
-                ),
-                Text(
-                  postDoc.postModel.content[PostModelField.overview],
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-          ),
-        ),
-        Divider(
-          color: Colors.grey.shade300,
-        ),
-        Row(
-          children: <Widget>[
-            Container(
-              child: Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.only(right: 0.0),
-                      child: Text(
-                        '${postDoc.postModel.likesCount} Likes!',
-                        style: likesCountText(postDoc.postModel.likesCount),
-                      ),
-                    ),
-                    IconButton(
-//                    color: Colors.yellow,
-                      splashColor: Colors.yellowAccent,
-                      icon: Icon(Icons.star_border),
-                      onPressed: () {},
-                    ),
-                    IconButton(
-                        splashColor: Colors.lightBlueAccent.shade100,
-                        icon: Icon(Icons.share),
-                        onPressed: () {}),
-                    IconButton(
-                        splashColor: Colors.red.shade300,
-                        icon: Icon(Icons.mood_bad),
-                        onPressed: () {})
-                  ],
-                ),
-              ),
-            ),
-          ],
-        )
-      ],
-    ),
-  );
 }

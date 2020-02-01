@@ -7,6 +7,7 @@ import 'package:evalio_app/presentation/constant/portfolio_details.dart';
 import 'package:evalio_app/presentation/editor/markdown_editor.dart';
 import 'package:evalio_app/presentation/home/evalio_home.dart';
 import 'package:evalio_app/presentation/login/login.dart';
+import 'package:evalio_app/presentation/profile/profile_editor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -75,6 +76,7 @@ class EvalioApp extends StatelessWidget {
           '/loggedIn': (context) => LoggedIn(),
           '/home': (context) => Home(userInfo),
           '/editor': (context) => DescriptionPortfolioEditor(),
+          '/profileEditor': (context) => ProfileEditor(),
           '/test': (context) => PortfolioDetails(),
         },
       ),

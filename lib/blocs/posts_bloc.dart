@@ -16,8 +16,13 @@ class PostsBloc {
   final _newPostsController = StreamController<List<PostModelDoc>>.broadcast();
   Stream<List<PostModelDoc>> get getNewPosts => _newPostsController.stream;
 
-  // 投稿クラス
-  PostModelDoc _postModelDoc;
+  // 最新投稿クラス
+  List<PostModelDoc> _postTrendModelDoc;
+  List<PostModelDoc> get getPostTrendModelDoc => _postTrendModelDoc;
+
+  // トレンド
+  List<PostModelDoc> _postNewModelDoc;
+  List<PostModelDoc> get getPostNewModelDoc => _postNewModelDoc;
 
   // コンストラクタ
   PostsBloc() {
@@ -31,19 +36,26 @@ class PostsBloc {
   //　トレンド取得
   void getTrendPostsList() async {
     List<PostModelDoc> _postModelDoc = await _postRepository.getTrendPosts();
-    if (_postModelDoc != null) _trendPostsController.sink.add(_postModelDoc);
+    if (_postModelDoc != null) {
+      _trendPostsController.sink.add(_postModelDoc);
+      _postTrendModelDoc = _postModelDoc;
+    }
   }
 
   // 最新リスト取得
   void getNewPostsList() async {
     List<PostModelDoc> _postModelDoc = await _postRepository.getNewPosts();
-    if (_postModelDoc != null) _newPostsController.sink.add(_postModelDoc);
+    if (_postModelDoc != null) {
+      _newPostsController.sink.add(_postModelDoc);
+      _postNewModelDoc = _postModelDoc;
+    }
   }
 
   // 投稿用のデータを確保する
 
   // ポートフォリオを登録
   void addPostData(
+    String postId,
     String title,
     List<String> langNames,
     File file,
@@ -52,11 +64,14 @@ class PostsBloc {
     String details,
     String userId,
   ) {
-    _postRepository.addPortfolio(
-        title, langNames, file, portfolioUrl, overview, details, userId);
+    _postRepository.addPortfolio(postId, title, langNames, file, portfolioUrl,
+        overview, details, userId);
   }
 
-  void setPostDate() {}
+  // いいね加算
+  void addLikesCount(String postId, String userId) {
+    _postRepository.addLikes(postId, userId);
+  }
 
   void dispose() {
     _trendPostsController.close();

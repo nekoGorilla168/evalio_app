@@ -25,9 +25,9 @@ class AuthRepository {
     DocumentSnapshot userDoc = await userDao.getUserInfo(userId);
     DocumentSnapshot postDoc = await postDao.getMyPortfolio(userId);
     return postDoc != null
-        ? UserModelDoc(userDoc.documentID, UserModel.fromMap(userDoc.data),
+        ? UserModelDoc(userDoc.documentID, UserModel.fromFire(userDoc.data),
             PostModelDoc(postDoc.documentID, PostModel.fromMap(postDoc.data)))
-        : UserModelDoc(userDoc.documentID, UserModel.fromMap(userDoc.data));
+        : UserModelDoc(userDoc.documentID, UserModel.fromFire(userDoc.data));
   }
 
   // FireAuthよりユーザー情報取得

@@ -1,5 +1,6 @@
 import 'package:evalio_app/blocs/bottom-navibar-bloc.dart';
 import 'package:evalio_app/blocs/user-bloc.dart';
+import 'package:evalio_app/models/user_model.dart';
 import 'package:evalio_app/presentation/constant/posts_list_app_bar.dart';
 import 'package:evalio_app/presentation/posts/posts_list.dart';
 import 'package:evalio_app/presentation/profile/profile.dart';
@@ -35,7 +36,8 @@ class Home extends StatelessWidget {
   ];
 
   // 画面に応じたボタンを返す
-  Widget _returnFloatingActBtn(int gamenIndex, BuildContext context) {
+  Widget _returnFloatingActBtn(
+      int gamenIndex, BuildContext context, UserModelDoc userModelDoc) {
     switch (gamenIndex) {
       case 0: // 一覧画面
         return Column(
@@ -65,7 +67,8 @@ class Home extends StatelessWidget {
         break;
       case 2:
         return FloatingActionButton(
-          onPressed: () {},
+          onPressed: () => Navigator.pushNamed(context, '/profileEditor',
+              arguments: userModelDoc),
           child: Icon(Icons.mode_edit),
         );
         break;
@@ -88,8 +91,8 @@ class Home extends StatelessWidget {
     return Scaffold(
       appBar: _appBarList.elementAt(_ctrlIndex.getCurIndex),
       body: IndexedStack(index: _ctrlIndex.getCurIndex, children: _pageWidgets),
-      floatingActionButton:
-          _returnFloatingActBtn(_ctrlIndex.getCurIndex, context),
+      floatingActionButton: _returnFloatingActBtn(
+          _ctrlIndex.getCurIndex, context, _ctrlUser.getUserDoc),
       bottomNavigationBar: BottomNavibarConst(),
     );
   }

@@ -11,7 +11,6 @@ import 'package:url_launcher/url_launcher.dart';
 
 class DescriptionPortfolioEditor extends StatelessWidget {
   final GlobalKey<ScaffoldState> _key = GlobalKey<ScaffoldState>();
-  final TextEditingController _textCntrl = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -280,6 +279,7 @@ class DescriptionPortfolioEditor extends StatelessWidget {
                                                   onPressed: () {
                                                     // ポートフォリオ登録
                                                     _postCtrl.addPostData(
+                                                        _userCtrl.getPostId,
                                                         _markdownCtrl
                                                             .getAppTitle,
                                                         _markdownCtrl
@@ -291,7 +291,10 @@ class DescriptionPortfolioEditor extends StatelessWidget {
                                                         _markdownCtrl
                                                             .getMarkDownData,
                                                         _userCtrl.getId);
-                                                    Navigator.pop(context);
+                                                    Navigator.popUntil(
+                                                        context,
+                                                        ModalRoute.withName(
+                                                            '/home'));
                                                   }),
                                             ],
                                           );
@@ -356,8 +359,9 @@ class DescriptionPortfolioEditor extends StatelessWidget {
                               child: _createKoumoku("アプリケーション詳細", 14),
                             ),
                             Padding(
-                              padding: EdgeInsets.only(right: 250.0),
+                              padding: EdgeInsets.only(right: 10),
                               child: Container(
+                                width: MediaQuery.of(context).size.width,
                                 child: MarkdownBody(
                                     data: _markdownCtrl.getMarkDownData),
                               ),

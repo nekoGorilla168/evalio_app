@@ -2,12 +2,15 @@ import 'dart:async';
 
 import 'package:evalio_app/models/user_model.dart';
 import 'package:evalio_app/repository/base_auth_repository.dart';
+import 'package:evalio_app/repository/users_repository.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserBloc {
   // リポジトリークラス
   final _authRepository = AuthRepository();
+  // ユーザーリポジトリクラス
+  final _userRepositpry = UserRepository();
 
   // ユーザー情報
   final _userController = StreamController<UserModelDoc>.broadcast();
@@ -20,9 +23,20 @@ class UserBloc {
   String _id = "";
   String get getId => _id;
 
+  // このユーザーの投稿Id取得
+  String _postId;
+  String get getPostId => _postId;
+
   // Sttream形式ではないユーザー情報
   UserModelDoc _userModelDoc;
   UserModelDoc get getUserDoc => _userModelDoc;
+
+  // 自己紹介
+  String _introducation;
+  String get getIntroducation => _introducation;
+  // 興味関心
+  String _interest;
+  String get getInterest => _interest;
 
   // コンストラクタ
   UserBloc() {
@@ -52,11 +66,29 @@ class UserBloc {
     UserModelDoc userModelDoc = await _authRepository.getUser(userId);
     _userController.sink.add(userModelDoc);
     _userModelDoc = userModelDoc;
+    if (userModelDoc.postModelDoc.postId != null)
+      _postId = userModelDoc.postModelDoc.postId;
+  }
+
+  // ユーザープロフィールを更新する
+  void updateUserProfile(String userId, String introducation, String interest) {
+    _userRepositpry.updateUser(userId, introducation, interest);
+    getUserInfo(userId);
   }
 
   // ユーザーIDをセットする
   void setUserId(String userId) {
     _id = userId;
+  }
+
+  // 自己紹介をセットする
+  void setIntroducation(String introducation) {
+    _introducation = introducation;
+  }
+
+  // 興味関心をセットする
+  void setInterest(String interst) {
+    _interest = interst;
   }
 
   // コントローラーの破棄
