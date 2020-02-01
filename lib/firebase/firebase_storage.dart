@@ -7,7 +7,7 @@ class FireStorage {
   // 自分のストレージがあるか確認する
   bool checkMyStorage(String userId) {
     bool isMyStorage = false;
-    StorageReference ref = FirebaseStorage().ref().child(userId);
+    StorageReference ref = FirebaseStorage().ref().child('$userId/');
     if (ref != null) {
       isMyStorage = true;
     }
@@ -38,13 +38,11 @@ class FireStorage {
   // ignore: missing_return
   Future<bool> deleteImage(String userId) async {
     bool isSuccess = false;
-    StorageReference deleteRef = FirebaseStorage().ref().child(userId);
+    StorageReference deleteRef = await FirebaseStorage.instance.getReferenceFromUrl(
+        'https://firebasestorage.googleapis.com/v0/b/evalio-app-project.appspot.com/o/3M0XiM0wJ7WzfwtqcPHpAXSG5J92%2F1580391137520?alt=media&token=6dc5f64b-3d9e-4fbb-8611-8cd5f9684d0a');
     // 削除処理実行
-    deleteRef.delete().then((value) {
-      isSuccess = true;
-    }).catchError((error) {
-      isSuccess = false;
-    });
+    if (deleteRef != null) deleteRef.delete();
+
     return isSuccess;
   }
 }

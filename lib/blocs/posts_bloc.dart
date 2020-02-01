@@ -15,6 +15,10 @@ class PostsBloc {
   // 最新順
   final _newPostsController = StreamController<List<PostModelDoc>>.broadcast();
   Stream<List<PostModelDoc>> get getNewPosts => _newPostsController.stream;
+  // 検索結果
+  final _searchResultController = StreamController<List<PostModelDoc>>();
+  Stream<List<PostModelDoc>> get getSearchResult =>
+      _searchResultController.stream;
 
   // 最新投稿クラス
   List<PostModelDoc> _postTrendModelDoc;
@@ -51,7 +55,29 @@ class PostsBloc {
     }
   }
 
-  // 投稿用のデータを確保する
+  // 検索
+  void getSerachResult({dynamic condition, int cardNo}) async {
+    List<PostModelDoc> _resultList;
+    switch (cardNo) {
+      case 0:
+        // 名前から検索
+        _resultList = await _postRepository.getPortFolioByName(condition);
+        break;
+      case 1:
+        // プログラミング言語から検索
+        _resultList = await _postRepository.getPortfolioByLanag(condition);
+        break;
+      default:
+        // お気に入りのリストから検索
+        for (int i = 0; i < condition.length; i++) {
+          PostModelDoc postModelDoc =
+              await _postRepository.getPortfolioById(condition[i]);
+          if (postModelDoc != null) _resultList.add(postModelDoc);
+        }
+        break;
+    }
+    if (_resultList != null) _searchResultController.sink.add(_resultList);
+  }
 
   // ポートフォリオを登録
   void addPostData(
@@ -63,7 +89,7 @@ class PostsBloc {
     String overview,
     String details,
     String userId,
-  ) {
+  ) async {
     _postRepository.addPortfolio(postId, title, langNames, file, portfolioUrl,
         overview, details, userId);
   }
@@ -76,5 +102,6 @@ class PostsBloc {
   void dispose() {
     _trendPostsController.close();
     _newPostsController.close();
+    _searchResultController.close();
   }
 }

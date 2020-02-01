@@ -1,8 +1,8 @@
 import 'package:evalio_app/blocs/user-bloc.dart';
 import 'package:evalio_app/models/user_model.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_share_me/flutter_share_me.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Profile extends StatelessWidget {
   @override
@@ -47,23 +47,23 @@ class Profile extends StatelessWidget {
                     _interestIcon,
                     1,
                     context),
-                FlatButton(
-                  onPressed: () async {
-                    var response = await FlutterShareMe().shareToTwitter(
-                      url: '',
-                      msg: '#evalio #Twitter転職',
-                    );
-                  },
-                  child: Text('Twitterで共有する'),
-                ),
-                FlatButton(
+                OutlineButton(
+                  shape: StadiumBorder(),
+                  borderSide:
+                      BorderSide(color: Colors.lightBlueAccent.shade100),
                   textColor: Colors.lightBlueAccent,
                   splashColor: Colors.lightBlueAccent.shade100,
                   onPressed: () {
-                    Navigator.pushNamed(context, '/test',
-                        arguments: _ctrlUser.getUserDoc);
+                    if (snapshot.data.postModelDoc != null) {
+                      Navigator.pushNamed(context, '/test',
+                          arguments: _ctrlUser.getUserDoc);
+                    } else {
+                      Navigator.pushNamed(context, 'editor');
+                    }
                   },
-                  child: Text('投稿されたポートフォリオを確認する'),
+                  child: snapshot.data.postModelDoc == null
+                      ? Text('ポートフォリオを投稿してみよう')
+                      : Text('自分のポートフォリオを確認する'),
                 )
               ],
             ),
@@ -82,11 +82,32 @@ class Profile extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10.0),
         ),
-        child: ListTile(
-          leading: CircleAvatar(
-            backgroundImage: NetworkImage(userModel.photoUrl),
-          ),
-          title: Text(userModel.userName),
+        child: Column(
+          children: <Widget>[
+            ListTile(
+              leading: CircleAvatar(
+                backgroundImage: NetworkImage(userModel.photoUrl),
+              ),
+              title: Text(userModel.userName),
+            ),
+            Divider(
+              color: Colors.grey,
+            ),
+            InkWell(
+              onTap: () async {
+                if (await canLaunch(userModel.twitterLink)) {
+                  await launch(userModel.twitterLink);
+                }
+              },
+              child: Container(
+                padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
+                child: Text(
+                  userModel.twitterLink,
+                  style: TextStyle(color: Colors.lightBlueAccent.shade100),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

@@ -21,8 +21,12 @@ class UserDao {
     fsUser.document(userModel.userId).setData({
       UserModelField.userName: userModel.userName,
       UserModelField.photoUrl: userModel.photoUrl,
-      "profile": {"interest": null, "selfIntroducation": null},
-      "likedPost": [],
+      UserModelField.profile: {
+        UserModelField.interest: null,
+        UserModelField.selfIntroducation: null
+      },
+      UserModelField.likedPost: [],
+      UserModelField.twitterLink: null,
       UserModelField.createdAt: new DateTime.now()
     });
   }
@@ -45,5 +49,13 @@ class UserDao {
   Future<DocumentSnapshot> getUserInfo(String userId) async {
     DocumentSnapshot doc = await fsUser.document(userId).get();
     return doc;
+  }
+
+  // ユーザー情報取得(名前)
+  Future<List<DocumentSnapshot>> getUserInfoByName(String userName) async {
+    QuerySnapshot qs = await fsUser
+        .where(UserModelField.userName, isEqualTo: userName)
+        .getDocuments();
+    return qs.documents;
   }
 }

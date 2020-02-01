@@ -47,8 +47,25 @@ class PostsDao {
     return qs.documents[0];
   }
 
+  // プログラミング言語から取得
+  Future<List<DocumentSnapshot>> getPortfolioByLanguages(
+      List<String> language) async {
+    QuerySnapshot qs = await fsPosts
+        .where(
+            '${PostModelField.content}.${PostModelField.programmingLanguage}',
+            arrayContains: language)
+        .getDocuments();
+    return qs.documents;
+  }
+
+  // postIDから取得
+  Future<DocumentSnapshot> getPortfolioById(String postId) async {
+    DocumentSnapshot doc = await fsPosts.document(postId).get();
+    return doc;
+  }
+
   // ポートフォリオを登録する
-  insertPortfolio(PostModelDoc postModelDoc, String userId) {
+  void insertPortfolio(PostModelDoc postModelDoc, String userId) async {
     // ユーザーIDへの参照
     var userRef = fsUsers.document(userId);
 

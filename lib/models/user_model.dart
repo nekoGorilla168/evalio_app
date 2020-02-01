@@ -16,6 +16,7 @@ class UserModel {
   String photoUrl; // ユーザーのプロフ写真URL
   List likedPost = []; // いいねしたポートフォリオ
   Map profile;
+  String twitterLink; // Twitterへのリンク
   DateTime createdAt; // 作成日
   DateTime updatedAt; // 更新日
 
@@ -38,6 +39,7 @@ class UserModel {
     this.userName = map[UserModelField.userName];
     this.photoUrl = map[UserModelField.photoUrl];
     this.likedPost = map[UserModelField.likedPost];
+    this.twitterLink = map[UserModelField.twitterLink];
     this.profile = map[UserModelField.profile];
   }
 
@@ -61,6 +63,7 @@ class UserModelField {
   static const profile = "profile";
   static const selfIntroducation = "selfIntroducation";
   static const interest = "interest";
+  static const twitterLink = "twitterLink";
   static const likedPost = "likedPost";
   static const updatedAt = "updatedAt";
   static const createdAt = "createdAt";

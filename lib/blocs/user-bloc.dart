@@ -31,12 +31,19 @@ class UserBloc {
   UserModelDoc _userModelDoc;
   UserModelDoc get getUserDoc => _userModelDoc;
 
+  // Twitterへのリンク
+  String _twitterLink;
+  String get getTwitterLink => _twitterLink;
   // 自己紹介
   String _introducation;
   String get getIntroducation => _introducation;
   // 興味関心
   String _interest;
   String get getInterest => _interest;
+
+  // お気に入りのリスト
+  List<String> _myFavorites;
+  List<String> get getMyFavorites => _myFavorites;
 
   // コンストラクタ
   UserBloc() {
@@ -64,10 +71,12 @@ class UserBloc {
   // ユーザー情報取得
   void getUserInfo(String userId) async {
     UserModelDoc userModelDoc = await _authRepository.getUser(userId);
-    _userController.sink.add(userModelDoc);
+    if (userModelDoc != null) _userController.sink.add(userModelDoc);
     _userModelDoc = userModelDoc;
-    if (userModelDoc.postModelDoc.postId != null)
+    _myFavorites = userModelDoc.userModel.likedPost.cast<String>();
+    if (userModelDoc.postModelDoc != null) {
       _postId = userModelDoc.postModelDoc.postId;
+    }
   }
 
   // ユーザープロフィールを更新する
@@ -79,6 +88,11 @@ class UserBloc {
   // ユーザーIDをセットする
   void setUserId(String userId) {
     _id = userId;
+  }
+
+  // Twitterリンクをセットする
+  void setTwitterLink(String link) {
+    _twitterLink = link;
   }
 
   // 自己紹介をセットする

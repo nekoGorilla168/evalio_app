@@ -22,8 +22,11 @@ class AuthRepository {
 
   // ユーザー情報取得
   Future getUser(String userId) async {
-    DocumentSnapshot userDoc = await userDao.getUserInfo(userId);
-    DocumentSnapshot postDoc = await postDao.getMyPortfolio(userId);
+    Future<DocumentSnapshot> futureUserDoc = userDao.getUserInfo(userId);
+    Future<DocumentSnapshot> futurePostDoc = postDao.getMyPortfolio(userId);
+    await Future.wait([futureUserDoc, futurePostDoc]);
+    DocumentSnapshot userDoc = await futureUserDoc;
+    DocumentSnapshot postDoc = await futurePostDoc;
     return postDoc != null
         ? UserModelDoc(userDoc.documentID, UserModel.fromFire(userDoc.data),
             PostModelDoc(postDoc.documentID, PostModel.fromMap(postDoc.data)))
