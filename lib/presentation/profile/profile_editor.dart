@@ -14,6 +14,10 @@ class ProfileEditor extends StatelessWidget {
     // ユーザー情報(遷移情報)
     UserModelDoc userInfo = ModalRoute.of(context).settings.arguments;
     // 使用アイコン定義
+    final _link = Icon(
+      Icons.link,
+      color: Colors.indigo,
+    );
     final _person = Icon(
       Icons.person,
       color: Colors.blueAccent,
@@ -33,25 +37,34 @@ class ProfileEditor extends StatelessWidget {
           child: SingleChildScrollView(
             child: Column(
               children: <Widget>[
-                /*入力エリアは共通化させる
-            * 入力エリアに番号を付与する
-            * 0 => 自己紹介
-            * 1 => 好きな興味のある技術
-            * */
-                _inputArea('自己紹介', _person, 0, _userCtrl),
-                _inputArea('好きな・興味のある技術', _technique, 1, _userCtrl),
-                FlatButton(
-                  onPressed: () {
-                    _userCtrl.updateUserProfile(userInfo.userId,
-                        _userCtrl.getIntroducation, _userCtrl.getInterest);
-                    // スナックバー表示
-                    _key.currentState.showSnackBar(
-                        const SnackBar(content: Text('プロフィールを更新しました。')));
-                    // 画面を破棄して戻る
-                    Navigator.pop(context);
-                  },
-                  child: Text('登録する'),
-                )
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    FlatButton.icon(
+                      onPressed: () {
+                        _userCtrl.updateUserProfile(userInfo.userId,
+                            _userCtrl.getIntroducation, _userCtrl.getInterest);
+                        // スナックバー表示
+                        _key.currentState.showSnackBar(
+                            const SnackBar(content: Text('プロフィールを更新しました。')));
+                        // 画面を破棄して戻る
+                        Navigator.pop(context);
+                      },
+                      icon: Icon(Icons.navigate_next),
+                      label: Text('登録する'),
+                    ),
+                  ],
+                ),
+                /*
+                  *入力エリアは共通化させる
+                  * 入力エリアに番号を付与する
+                  * 0 => Twitterリンク
+                  * 1 => 自己紹介
+                  * 2 => 好きな興味のある技術
+                  * */
+                _inputArea('あなたのTwitterへのリンク', _link, 0, _userCtrl),
+                _inputArea('自己紹介', _person, 1, _userCtrl),
+                _inputArea('好きな・興味のある技術', _technique, 2, _userCtrl),
               ],
             ),
           ),
@@ -66,6 +79,8 @@ class ProfileEditor extends StatelessWidget {
     // 初期値設定
     String data;
     if (areaNo == 0) {
+      data = userCtrl.getUserDoc.userModel.twitterLink;
+    } else if (areaNo == 1) {
       data = userCtrl
           .getUserDoc.userModel.profile[UserModelField.selfIntroducation];
     } else {
@@ -86,6 +101,8 @@ class ProfileEditor extends StatelessWidget {
         ),
         onChanged: (String inputData) {
           if (areaNo == 0) {
+            userCtrl.setTwitterLink(inputData);
+          } else if (areaNo == 1) {
             userCtrl.setIntroducation(inputData);
           } else {
             userCtrl.setInterest(inputData);

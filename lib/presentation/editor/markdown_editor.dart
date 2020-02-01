@@ -291,6 +291,8 @@ class DescriptionPortfolioEditor extends StatelessWidget {
                                                         _markdownCtrl
                                                             .getMarkDownData,
                                                         _userCtrl.getId);
+                                                    _userCtrl.getUserInfo(
+                                                        _userCtrl.getId);
                                                     Navigator.popUntil(
                                                         context,
                                                         ModalRoute.withName(

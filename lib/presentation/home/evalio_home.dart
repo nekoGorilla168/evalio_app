@@ -4,6 +4,7 @@ import 'package:evalio_app/models/user_model.dart';
 import 'package:evalio_app/presentation/constant/posts_list_app_bar.dart';
 import 'package:evalio_app/presentation/posts/posts_list.dart';
 import 'package:evalio_app/presentation/profile/profile.dart';
+import 'package:evalio_app/presentation/search/search.dart';
 import 'package:evalio_app/presentation/settings/logout.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -23,14 +24,12 @@ class Home extends StatelessWidget {
     PostsListAppBar(),
     PostsListAppBar(),
     PostsListAppBar(),
-    PostsListAppBar(),
   ];
 
   // BottomNavBar遷移先ウィジェットリスト
   static final _pageWidgets = [
     PostsList(),
-    Profile(),
-    Profile(),
+    InputSearchCondition(),
     Profile(),
     Settings(),
   ];
@@ -57,12 +56,6 @@ class Home extends StatelessWidget {
               child: Icon(Icons.update),
             )
           ],
-        );
-        break;
-      case 1:
-        return FloatingActionButton(
-          onPressed: () {},
-          child: Icon(Icons.search),
         );
         break;
       case 2:
@@ -106,13 +99,22 @@ class BottomNavibarConst extends StatelessWidget {
 
     return BottomNavigationBar(
       items: <BottomNavigationBarItem>[
-        BottomNavigationBarItem(icon: Icon(Icons.view_list), title: Text('一覧')),
-        BottomNavigationBarItem(icon: Icon(Icons.search), title: Text('検索')),
         BottomNavigationBarItem(
-            icon: Icon(Icons.person), title: Text('プロフィール')),
+          icon: Icon(Icons.view_list),
+          title: Text('一覧'),
+        ),
         BottomNavigationBarItem(
-            icon: Icon(Icons.star_border), title: Text('お気に入り')),
-        BottomNavigationBarItem(icon: Icon(Icons.settings), title: Text('その他'))
+          icon: Icon(Icons.search),
+          title: Text('検索'),
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.person),
+          title: Text('プロフィール'),
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.settings),
+          title: Text('その他'),
+        )
       ],
       onTap: (int index) {
         _ctrlIndex.selectedNavBarIndexChanged(index);

@@ -2,11 +2,13 @@ import 'package:evalio_app/blocs/bottom-navibar-bloc.dart';
 import 'package:evalio_app/blocs/display_post_list_bloc.dart';
 import 'package:evalio_app/blocs/markdown_bloc.dart';
 import 'package:evalio_app/blocs/posts_bloc.dart';
+import 'package:evalio_app/blocs/search_condition_bloc.dart';
 import 'package:evalio_app/blocs/user-bloc.dart';
 import 'package:evalio_app/presentation/constant/portfolio_details.dart';
 import 'package:evalio_app/presentation/editor/markdown_editor.dart';
 import 'package:evalio_app/presentation/home/evalio_home.dart';
 import 'package:evalio_app/presentation/login/login.dart';
+import 'package:evalio_app/presentation/posts/search_result_posts_list.dart';
 import 'package:evalio_app/presentation/profile/profile_editor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -47,6 +49,8 @@ class EvalioApp extends StatelessWidget {
         ChangeNotifierProvider<MarkDownBloc>(
           create: (_) => MarkDownBloc(),
         ),
+        ChangeNotifierProvider<SearchConditionBloc>(
+            create: (_) => SearchConditionBloc()),
         // ユーザー情報プロバイダ
         Provider<UserBloc>(
           create: (_) => UserBloc(),
@@ -77,6 +81,7 @@ class EvalioApp extends StatelessWidget {
           '/home': (context) => Home(userInfo),
           '/editor': (context) => DescriptionPortfolioEditor(),
           '/profileEditor': (context) => ProfileEditor(),
+          '/result': (context) => SearcResultPosts(),
           '/test': (context) => PortfolioDetails(),
         },
       ),
