@@ -70,8 +70,9 @@ class PostsRepositpry {
     }
   }
 
-  // 投稿
+  // 投稿処理
   void addPortfolio(
+      String postId,
       String title,
       List<String> langNames,
       File file,
@@ -79,6 +80,11 @@ class PostsRepositpry {
       String overview,
       String details,
       String userId) async {
+    // ストレージのチェック
+    bool isExist = _storage.checkMyStorage(userId);
+    if (isExist) {
+      _storage.deleteImage(userId);
+    }
     // 画像をストレージへ保存し、ダウンロードURLを取得する
     String imageUrl = await _storage.uploadImage(file, userId);
     // 言語名からKeyを取得する
@@ -90,7 +96,7 @@ class PostsRepositpry {
     // 登録処理
     _postDao.insertPortfolio(
         PostModelDoc(
-            null,
+            postId ?? null,
             PostModel(
                 title: title,
                 programmingLanguage: langKey,
@@ -100,4 +106,8 @@ class PostsRepositpry {
                 details: details)),
         userId);
   }
+
+  // いいねカウント
+  void addLikes(String postId, String userId) =>
+      _postDao.addLikesCount(postId, userId);
 }

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:evalio_app/models/posts_model.dart';
+import 'package:evalio_app/models/user_model.dart';
 import 'package:uuid/uuid.dart';
 
 class PostsDao {
@@ -10,6 +11,7 @@ class PostsDao {
 
   // バッチ処理用
   final batch = Firestore.instance.batch();
+
   // 最大10件
   final int maxKensu = 10;
 
@@ -47,18 +49,23 @@ class PostsDao {
 
   // ポートフォリオを登録する
   insertPortfolio(PostModelDoc postModelDoc, String userId) {
+    // ユーザーIDへの参照
+    var userRef = fsUsers.document(userId);
+
     if (postModelDoc.postId == null) {
       // uuid生成
       var uuid = Uuid();
       // ドキュメントID用のユニークなID
       String portfolioId = uuid.v1();
-
+      //
+      var createDate = DateTime.now();
       // ポートフォリオ新規登録
       var newPortfolio = fsPosts.document(portfolioId);
       batch.setData(newPortfolio, {
         PostModelField.content: {
           PostModelField.title: postModelDoc.postModel.title,
           PostModelField.portfolioUrl: postModelDoc.postModel.portfolioUrl,
+          PostModelField.imageUrl: postModelDoc.postModel.imageUrl,
           PostModelField.overview: postModelDoc.postModel.overview,
           PostModelField.programmingLanguage:
               postModelDoc.postModel.programmingLanguage,
@@ -66,9 +73,9 @@ class PostsDao {
         },
         PostModelField.programmingLanguage:
             postModelDoc.postModel.programmingLanguage,
-        PostModelField.postUserIdRef: userId,
+        PostModelField.postUserIdRef: userRef,
         PostModelField.likesCount: postModelDoc.postModel.likesCount,
-        PostModelField.createdAt: FieldValueType.serverTimestamp,
+        PostModelField.createdAt: createDate,
       });
       // ユーザー側にも同じ内容を書き込み
       // userのサブコレクションに追加
@@ -77,6 +84,7 @@ class PostsDao {
       batch.setData(newPortfolio, {
         PostModelField.content: {
           PostModelField.title: postModelDoc.postModel.title,
+          PostModelField.imageUrl: postModelDoc.postModel.imageUrl,
           PostModelField.portfolioUrl: postModelDoc.postModel.portfolioUrl,
           PostModelField.overview: postModelDoc.postModel.overview,
           PostModelField.programmingLanguage:
@@ -85,29 +93,79 @@ class PostsDao {
         },
         PostModelField.programmingLanguage:
             postModelDoc.postModel.programmingLanguage,
-        PostModelField.postUserIdRef: userId,
+        PostModelField.postUserIdRef: userRef,
         PostModelField.likesCount: postModelDoc.postModel.likesCount,
-        PostModelField.createdAt: FieldValueType.serverTimestamp,
+        PostModelField.createdAt: createDate,
       });
       // バッチ処理
       batch.commit();
     } else {
+      var updateDate = DateTime.now();
+
       // ポートフォリオ更新
-      fsPosts.document(postModelDoc.postId).setData({
-        PostModelField.content: {
-          PostModelField.title: postModelDoc.postModel.title,
-          PostModelField.portfolioUrl: postModelDoc.postModel.portfolioUrl,
-          PostModelField.overview: postModelDoc.postModel.overview,
-          PostModelField.programmingLanguage:
-              postModelDoc.postModel.programmingLanguage,
-          PostModelField.details: postModelDoc.postModel.details,
-        },
-        PostModelField.programmingLanguage:
-            postModelDoc.postModel.programmingLanguage,
-        PostModelField.postUserIdRef: userId,
-        PostModelField.likesCount: postModelDoc.postModel.likesCount,
-        PostModelField.updatedAt: FieldValueType.serverTimestamp,
-      }, merge: true);
+      var updatePortfolio = fsPosts.document(postModelDoc.postId);
+      batch.setData(
+          updatePortfolio,
+          {
+            PostModelField.content: {
+              PostModelField.title: postModelDoc.postModel.title,
+              PostModelField.imageUrl: postModelDoc.postModel.imageUrl,
+              PostModelField.portfolioUrl: postModelDoc.postModel.portfolioUrl,
+              PostModelField.overview: postModelDoc.postModel.overview,
+              PostModelField.programmingLanguage:
+                  postModelDoc.postModel.programmingLanguage,
+              PostModelField.details: postModelDoc.postModel.details,
+            },
+            PostModelField.programmingLanguage:
+                postModelDoc.postModel.programmingLanguage,
+            PostModelField.postUserIdRef: userRef,
+            PostModelField.likesCount: postModelDoc.postModel.likesCount,
+            PostModelField.updatedAt: updateDate,
+          },
+          merge: true);
+      updatePortfolio = fsUsers
+          .document(userId)
+          .collection("post")
+          .document(postModelDoc.postId);
+      batch.setData(
+          updatePortfolio,
+          {
+            PostModelField.content: {
+              PostModelField.title: postModelDoc.postModel.title,
+              PostModelField.imageUrl: postModelDoc.postModel.imageUrl,
+              PostModelField.portfolioUrl: postModelDoc.postModel.portfolioUrl,
+              PostModelField.overview: postModelDoc.postModel.overview,
+              PostModelField.programmingLanguage:
+                  postModelDoc.postModel.programmingLanguage,
+              PostModelField.details: postModelDoc.postModel.details,
+            },
+            PostModelField.programmingLanguage:
+                postModelDoc.postModel.programmingLanguage,
+            PostModelField.postUserIdRef: userRef,
+            PostModelField.likesCount: postModelDoc.postModel.likesCount,
+            PostModelField.updatedAt: updateDate,
+          },
+          merge: true);
+      batch.commit();
     }
+  }
+
+  // いいねをカウントし、お気に入りに追加する
+  void addLikesCount(String postId, String userId) {
+    var postRef = fsPosts.document(postId);
+
+    Firestore.instance.runTransaction((t) {
+      return t.get(postRef).then((doc) {
+        if (doc.exists)
+          t.update(postRef, <String, dynamic>{
+            PostModelField.likesCount: doc.data[PostModelField.likesCount] + 1
+          }).then((value) {
+            // いいねの追加が成功した場合、自分のお気に入りにも追加する
+            fsUsers.document(userId).updateData(<String, dynamic>{
+              UserModelField.likedPost: FieldValue.arrayUnion([postId])
+            });
+          });
+      });
+    });
   }
 }

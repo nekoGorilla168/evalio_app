@@ -42,10 +42,7 @@ class PostModel {
   // 名前付きコンストラクタ
   PostModel.fromMap(Map map) {
     this.postId = map[PostModelField.postId];
-    //this.postUserId = map[PostModelField.postUserId];
-    this.programmingLanguage = map[PostModelField.programmingLanguage];
     this.content = map[PostModelField.content];
-    this.title = map[PostModelField.title];
     this.likesCount = map[PostModelField.likesCount];
     //日付変換
     // 登録日
@@ -74,6 +71,6 @@ class PostModelField {
   static const likesCount = "likesCount";
   static const createdAt = "createdAt";
   static const updatedAt = "updatedAt";
-
+  static const imageUrl = "imageUrl";
   static const programmingLanguage = "programmingLanguage";
 }

@@ -25,6 +25,11 @@ class ProgrammingLangMap {
     "023": "Azure",
     "024": "Firebase",
     "025": "Heroku",
+    "026": "Swift",
+    "027": "Kotlin",
+    "028": "Objective-C",
+    "029": "Bootstrap",
+    "030": "Flask",
   };
 
   // プログラミング言語名のリスト

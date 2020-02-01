@@ -22,14 +22,24 @@ class UserDao {
       UserModelField.userName: userModel.userName,
       UserModelField.photoUrl: userModel.photoUrl,
       "profile": {"interest": null, "selfIntroducation": null},
-      "likedPosts": [],
-      "post": null,
+      "likedPost": [],
       UserModelField.createdAt: new DateTime.now()
     });
   }
 
   // ユーザー情報更新
   void updateUserInfo(UserModel userModel) {}
+
+  // ユーザープロフィール更新
+  void updateProfile(String userId, Map<String, String> profile) {
+    fsUser.document(userId).updateData({
+      UserModelField.profile: {
+        UserModelField.interest: profile[UserModelField.interest],
+        UserModelField.selfIntroducation:
+            profile[UserModelField.selfIntroducation],
+      }
+    });
+  }
 
 // ユーザー情報取得
   Future<DocumentSnapshot> getUserInfo(String userId) async {
