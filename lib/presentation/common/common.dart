@@ -1,8 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:evalio_app/blocs/display_post_list_bloc.dart';
 import 'package:evalio_app/blocs/posts_bloc.dart';
 import 'package:evalio_app/blocs/user-bloc.dart';
 import 'package:evalio_app/models/const_programming_language_model.dart';
 import 'package:evalio_app/models/posts_model.dart';
+import 'package:evalio_app/models/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_share_me/flutter_share_me.dart';
 import 'package:intl/intl.dart';
@@ -53,15 +55,13 @@ class CommonProcessing {
   // 最新かトレンドを表示するメソッド
   Widget postList(
       List<PostModelDoc> postList, DateFormat format, BuildContext context) {
-    return postList == null
-        ? CircularProgressIndicator()
-        : Container(
-            child: ListView.builder(
-                itemCount: postList.length,
-                itemBuilder: (context, index) {
-                  return _createPostCard(postList[index], format, context);
-                }),
-          );
+    return Container(
+      child: ListView.builder(
+          itemCount: postList.length,
+          itemBuilder: (context, index) {
+            return _createPostCard(postList[index], format, context);
+          }),
+    );
   }
 
   // カードを作成するメソッド
@@ -69,6 +69,8 @@ class CommonProcessing {
       PostModelDoc postDoc, DateFormat format, BuildContext context) {
     final _postCtrl = Provider.of<PostsBloc>(context);
     final _userCtrl = Provider.of<UserBloc>(context);
+    final _displayCtrl = Provider.of<DisplayPostsListBloc>(context);
+
     bool myFavorite = false;
     // このカードがお気に入りかどうか判定する
     if (_userCtrl.getUserDoc.userModel.likedPost.contains(postDoc.postId)) {
@@ -81,7 +83,9 @@ class CommonProcessing {
         children: <Widget>[
           Row(
             children: <Widget>[
-              _returnAuthorNmPhoto(postDoc.userModelDocRef.userModel.userName),
+              _returnAuthorNmPhoto(
+                postDoc.userModelDocRef.userModel.userName,
+              ),
               _returnPostedDateTime(postDoc.postModel.createdAt, format),
             ],
           ),
@@ -111,7 +115,11 @@ class CommonProcessing {
           ),
           InkWell(
             splashColor: Colors.lightBlueAccent.shade100,
-            onTap: () {},
+            onTap: () {
+              Navigator.of(context).pushNamed('/details',
+                  arguments: UserModelDoc(postDoc.userModelDocRef.userId,
+                      postDoc.userModelDocRef.userModel, postDoc));
+            },
             child: Container(
               width: 360,
               child: Column(
@@ -149,15 +157,32 @@ class CommonProcessing {
                           style: _likesCountText(postDoc.postModel.likesCount),
                         ),
                       ),
-                      IconButton(
-                        color: myFavorite == true ? Colors.yellow : null,
-                        splashColor: Colors.yellowAccent,
-                        icon: Icon(Icons.star_border),
-                        onPressed: () {
-                          _postCtrl.addLikesCount(
-                              postDoc.postId, _userCtrl.getId);
-                        },
-                      ),
+                      StreamBuilder<int>(
+                          stream: _postCtrl.getIsMyFavorite,
+                          builder: (context, snapshot) {
+                            return IconButton(
+                              color: myFavorite == true ? Colors.yellow : null,
+                              splashColor: Colors.yellowAccent,
+                              icon: Icon(Icons.star_border),
+                              onPressed: () {
+                                _postCtrl.addLikesCount(
+                                    postDoc.postId, _userCtrl.getId);
+                                if (snapshot.connectionState ==
+                                        ConnectionState.done &&
+                                    snapshot.data == 1) {
+//                              _displayCtrl.setHomeKet();
+                                  // スナックバー表示
+                                  Scaffold.of(context).showSnackBar(
+                                      SnackBar(content: Text('お気に入りに追加しました')));
+                                } else if (snapshot.data == 0) {
+                                  // スナックバー表示
+//                              _displayCtrl.setHomeKet(addOrdelete);
+                                  Scaffold.of(context).showSnackBar(
+                                      SnackBar(content: Text('お気に入りから削除しました')));
+                                }
+                              },
+                            );
+                          }),
                       IconButton(
                         splashColor: Colors.lightBlueAccent.shade100,
                         icon: Icon(Icons.share),
@@ -173,7 +198,7 @@ class CommonProcessing {
                       IconButton(
                           splashColor: Colors.red.shade300,
                           icon: Icon(Icons.mood_bad),
-                          onPressed: () {})
+                          onPressed: () {}),
                     ],
                   ),
                 ),

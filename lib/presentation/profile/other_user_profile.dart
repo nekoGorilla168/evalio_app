@@ -1,13 +1,12 @@
-import 'package:evalio_app/blocs/user-bloc.dart';
 import 'package:evalio_app/models/user_model.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class Profile extends StatelessWidget {
+class OtherUserProfile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final _ctrlUser = Provider.of<UserBloc>(context);
+    UserModelDoc otherUser = ModalRoute.of(context).settings.arguments;
+
     // アイコン定義
     final _selfIcon = Icon(
       Icons.person,
@@ -18,59 +17,37 @@ class Profile extends StatelessWidget {
       color: Colors.green.shade300,
     );
 
-    return StreamBuilder<UserModelDoc>(
-      stream: _ctrlUser.getUser,
-      builder: (context, snapshot) {
-        if (snapshot.data == null) {
-          return Center(
-            child: CircularProgressIndicator(),
-          );
-        } else {
-          return SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                _userInfoCard(snapshot.data.userModel, context),
-                /*
+    return otherUser == null
+        ? Center(child: CircularProgressIndicator())
+        : Scaffold(
+            appBar: AppBar(
+              title: Text('ユーザープロフィール'),
+            ),
+            body: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  _userInfoCard(otherUser.userModel, context),
+                  /*
               * カード共通
               * 0 => 自己紹介カード
               * 1 => 好きな・興味関心のある技術カード
               * */
-                _commonProfileCard(
-                    snapshot.data.userModel
-                        .profile[UserModelField.selfIntroducation],
-                    _selfIcon,
-                    0,
-                    context),
-                _commonProfileCard(
-                    snapshot.data.userModel.profile[UserModelField.interest],
-                    _interestIcon,
-                    1,
-                    context),
-                OutlineButton(
-                  shape: StadiumBorder(),
-                  borderSide:
-                      BorderSide(color: Colors.lightBlueAccent.shade100),
-                  textColor: Colors.lightBlueAccent,
-                  splashColor: Colors.lightBlueAccent.shade100,
-                  onPressed: () {
-                    if (snapshot.data.postModelDoc != null) {
-                      Navigator.pushNamed(context, '/details',
-                          arguments: _ctrlUser.getUserDoc);
-                    } else {
-                      Navigator.pushNamed(context, 'editor');
-                    }
-                  },
-                  child: snapshot.data.postModelDoc == null
-                      ? Text('ポートフォリオを投稿してみよう')
-                      : Text('自分のポートフォリオを確認する'),
-                )
-              ],
+                  _commonProfileCard(
+                      otherUser
+                          .userModel.profile[UserModelField.selfIntroducation],
+                      _selfIcon,
+                      0,
+                      context),
+                  _commonProfileCard(
+                      otherUser.userModel.profile[UserModelField.interest],
+                      _interestIcon,
+                      1,
+                      context),
+                ],
+              ),
             ),
           );
-        }
-      },
-    );
   }
 
   // ユーザーカード

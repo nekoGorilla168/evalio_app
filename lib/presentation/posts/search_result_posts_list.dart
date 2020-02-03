@@ -24,7 +24,10 @@ class SearcResultPosts extends StatelessWidget {
           child: StreamBuilder<List<PostModelDoc>>(
             stream: _postCtrl.getSearchResult,
             builder: (context, snapshot) {
-              if (snapshot.data == null) return CircularProgressIndicator();
+              if (snapshot.data == null)
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
               return common.postList(snapshot.data, _format, context);
             },
           ),

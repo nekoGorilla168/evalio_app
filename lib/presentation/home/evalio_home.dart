@@ -1,4 +1,5 @@
 import 'package:evalio_app/blocs/bottom-navibar-bloc.dart';
+import 'package:evalio_app/blocs/display_post_list_bloc.dart';
 import 'package:evalio_app/blocs/user-bloc.dart';
 import 'package:evalio_app/models/user_model.dart';
 import 'package:evalio_app/presentation/constant/posts_list_app_bar.dart';
@@ -74,6 +75,7 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // インデックスコントロール
+    final _displayPosListCtrl = Provider.of<DisplayPostsListBloc>(context);
     final _ctrlIndex = Provider.of<NavigationBarBloc>(context);
     final _ctrlUser = Provider.of<UserBloc>(context);
     if (id != null) {
@@ -89,6 +91,7 @@ class Home extends StatelessWidget {
       bottomNavigationBar: BottomNavibarConst(),
     );
   }
+//  _displayPosListCtrl.getIsAddedMyFavorite == true ? _key.currentState.showSnackBar(SnackBar(content: Text('お気に入りに追加しました'))) : _key.currentState.showSnackBar(SnackBar(content: Text('お気に入りから削除しました')));
 }
 
 // ボトムナビバークラス

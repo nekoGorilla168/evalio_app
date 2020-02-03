@@ -1,10 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:evalio_app/blocs/user-bloc.dart';
 import 'package:evalio_app/models/const_programming_language_model.dart';
 import 'package:evalio_app/models/posts_model.dart';
 import 'package:evalio_app/models/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class PortfolioDetails extends StatelessWidget {
@@ -26,8 +28,7 @@ class PortfolioDetails extends StatelessWidget {
                 child: Column(
                   children: <Widget>[
                     // 投稿ユーザー情報
-                    postUserInfo(userInfo.userModel.userName,
-                        userInfo.userModel.photoUrl),
+                    postUserInfo(context, userInfo),
                     // 投稿日・更新日
                     showPostedDate(userInfo.postModelDoc.postModel.createdAt,
                         userInfo.postModelDoc.postModel.updatedAt),
@@ -83,34 +84,44 @@ class PortfolioDetails extends StatelessWidget {
   }
 
   // 投稿したユーザーの情報
-  Widget postUserInfo(String userName, String photoUrl) {
+  Widget postUserInfo(BuildContext context, UserModelDoc userModelDoc) {
     // 文字のスタイル
     final style = TextStyle(fontSize: 15.0);
+    final _userCtrl = Provider.of<UserBloc>(context);
 
-    return Container(
-      padding: EdgeInsets.all(15.0),
-      child: Row(
-        children: <Widget>[
-          Container(
-            child: CachedNetworkImage(
-              imageUrl: photoUrl,
-              imageBuilder: (context, imgProvider) => Container(
-                width: 70,
-                height: 70,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  image: DecorationImage(image: imgProvider, fit: BoxFit.fill),
+    return InkWell(
+      onTap: () {
+        if (_userCtrl.getId != userModelDoc.userId) {
+          Navigator.of(context).pushNamed('/otherUserProfile',
+              arguments: userModelDoc);
+        }
+      },
+      child: Container(
+        padding: EdgeInsets.all(15.0),
+        child: Row(
+          children: <Widget>[
+            Container(
+              child: CachedNetworkImage(
+                imageUrl: userModelDoc.userModel.photoUrl,
+                imageBuilder: (context, imgProvider) => Container(
+                  width: 70,
+                  height: 70,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    image:
+                        DecorationImage(image: imgProvider, fit: BoxFit.fill),
+                  ),
                 ),
+                placeholder: (context, img) => CircularProgressIndicator(),
+                errorWidget: (context, img, error) => Icon(Icons.error),
               ),
-              placeholder: (context, img) => CircularProgressIndicator(),
-              errorWidget: (context, img, error) => Icon(Icons.error),
             ),
-          ),
-          Text(
-            userName,
-            style: style,
-          ),
-        ],
+            Text(
+              userModelDoc.userModel.userName,
+              style: style,
+            ),
+          ],
+        ),
       ),
     );
   }

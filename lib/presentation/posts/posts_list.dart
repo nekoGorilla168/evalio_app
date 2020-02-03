@@ -1,5 +1,6 @@
 import 'package:evalio_app/blocs/display_post_list_bloc.dart';
 import 'package:evalio_app/blocs/posts_bloc.dart';
+import 'package:evalio_app/models/posts_model.dart';
 import 'package:evalio_app/presentation/common/common.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -102,14 +103,22 @@ class PostsList extends StatelessWidget {
               child: IndexedStack(
                 index: _streamCtrl.getCurIndex,
                 children: <Widget>[
-                  _postsCtrl.getPostTrendModelDoc == null
-                      ? CircularProgressIndicator()
-                      : common.postList(
-                          _postsCtrl.getPostTrendModelDoc, _format, context),
-                  _postsCtrl.getPostTrendModelDoc == null
-                      ? CircularProgressIndicator()
-                      : common.postList(
-                          _postsCtrl.getPostNewModelDoc, _format, context),
+                  StreamBuilder<List<PostModelDoc>>(
+                    stream: _postsCtrl.getTrendPosts,
+                    builder: (context, snapshot) {
+                      return snapshot.hasData
+                          ? common.postList(snapshot.data, _format, context)
+                          : CircularProgressIndicator();
+                    },
+                  ),
+                  StreamBuilder<List<PostModelDoc>>(
+                    stream: _postsCtrl.getNewPosts,
+                    builder: (context, snapshot) {
+                      return snapshot.hasData
+                          ? common.postList(snapshot.data, _format, context)
+                          : CircularProgressIndicator();
+                    },
+                  ),
                 ],
               ),
             ),
