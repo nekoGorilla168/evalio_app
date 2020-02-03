@@ -9,6 +9,7 @@ import 'package:evalio_app/presentation/editor/markdown_editor.dart';
 import 'package:evalio_app/presentation/home/evalio_home.dart';
 import 'package:evalio_app/presentation/login/login.dart';
 import 'package:evalio_app/presentation/posts/search_result_posts_list.dart';
+import 'package:evalio_app/presentation/profile/other_user_profile.dart';
 import 'package:evalio_app/presentation/profile/profile_editor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -82,7 +83,8 @@ class EvalioApp extends StatelessWidget {
           '/editor': (context) => DescriptionPortfolioEditor(),
           '/profileEditor': (context) => ProfileEditor(),
           '/result': (context) => SearcResultPosts(),
-          '/test': (context) => PortfolioDetails(),
+          '/details': (context) => PortfolioDetails(),
+          '/otherUserProfile': (context) => OtherUserProfile(),
         },
       ),
     );

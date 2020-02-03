@@ -15,19 +15,27 @@ class PostsDao {
   // 最大10件
   final int maxKensu = 10;
 
+  // 開始日(2日前)
+  final startDate = DateTime.now().subtract(new Duration(days: 2));
+  // 終了日
+  final endDate = DateTime.now();
+
   // いいね数順取得(上限10件)
+  // 指定範囲は過去2日間の間
   Future<List<DocumentSnapshot>> getTrendPostsList() async {
     QuerySnapshot qs = await fsPosts
-        .orderBy("likesCount", descending: true)
+        .where(PostModelField.createdAt, isGreaterThanOrEqualTo: startDate)
+        .where(PostModelField.createdAt, isLessThanOrEqualTo: endDate)
+        .orderBy(PostModelField.createdAt, descending: true)
         .limit(maxKensu)
         .getDocuments();
     return qs.documents;
   }
 
-  // 最新順取得
+  // 最新順取得(上限10件)
   Future<List<DocumentSnapshot>> getNewPostsList() async {
     QuerySnapshot qs = await fsPosts
-        .orderBy("createdAt", descending: true)
+        .orderBy(PostModelField.createdAt, descending: true)
         .limit(maxKensu)
         .getDocuments();
     return qs.documents;
@@ -49,11 +57,11 @@ class PostsDao {
 
   // プログラミング言語から取得
   Future<List<DocumentSnapshot>> getPortfolioByLanguages(
-      List<String> language) async {
+      List<String> langKey) async {
     QuerySnapshot qs = await fsPosts
         .where(
             '${PostModelField.content}.${PostModelField.programmingLanguage}',
-            arrayContains: language)
+            arrayContainsAny: langKey)
         .getDocuments();
     return qs.documents;
   }
@@ -167,22 +175,37 @@ class PostsDao {
     }
   }
 
-  // いいねをカウントし、お気に入りに追加する
-  void addLikesCount(String postId, String userId) {
+  // いいねをカウントし、お気に入りに追加・削除する
+  Future<int> addLikesCount(String postId, String userId) async {
+    // true: 追加
+    // false: 削除
+    int isAdd = -1;
     var postRef = fsPosts.document(postId);
+    DocumentSnapshot postDoc = await postRef.get();
+    int likesCount = await postDoc.data[PostModelField.likesCount];
+    var userRef = fsUsers.document(userId);
+    DocumentSnapshot doc = await userRef.get();
+    List likedPost = await doc.data[UserModelField.likedPost];
 
-    Firestore.instance.runTransaction((t) {
-      return t.get(postRef).then((doc) {
-        if (doc.exists)
-          t.update(postRef, <String, dynamic>{
-            PostModelField.likesCount: doc.data[PostModelField.likesCount] + 1
-          }).then((value) {
-            // いいねの追加が成功した場合、自分のお気に入りにも追加する
-            fsUsers.document(userId).updateData(<String, dynamic>{
-              UserModelField.likedPost: FieldValue.arrayUnion([postId])
-            });
-          });
+    // 登録処理
+    if (likedPost.contains(postId)) {
+      batch.updateData(postRef, {PostModelField.likesCount: likesCount + 1});
+      batch.updateData(userRef, {
+        UserModelField.likedPost: FieldValue.arrayUnion([postId])
       });
-    });
+      batch.commit().then((voidValue) {
+        isAdd = 1;
+        return isAdd;
+      });
+    } else {
+      batch.updateData(postRef, {PostModelField.likesCount: likesCount - 1});
+      batch.updateData(userRef, {
+        UserModelField.likedPost: FieldValue.arrayRemove([postId])
+      });
+      batch.commit().then((voidValue) {
+        isAdd = 0;
+        return isAdd;
+      });
+    }
   }
 }

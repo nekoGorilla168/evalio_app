@@ -174,6 +174,7 @@ class PostsRepositpry {
   }
 
   // いいねカウント
-  void addLikes(String postId, String userId) =>
-      _postDao.addLikesCount(postId, userId);
+  Future<int> addLikes(String postId, String userId) async {
+    return await _postDao.addLikesCount(postId, userId);
+  }
 }

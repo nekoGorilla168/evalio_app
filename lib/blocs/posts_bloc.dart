@@ -16,9 +16,13 @@ class PostsBloc {
   final _newPostsController = StreamController<List<PostModelDoc>>.broadcast();
   Stream<List<PostModelDoc>> get getNewPosts => _newPostsController.stream;
   // 検索結果
-  final _searchResultController = StreamController<List<PostModelDoc>>();
+  final _searchResultController =
+      StreamController<List<PostModelDoc>>.broadcast();
   Stream<List<PostModelDoc>> get getSearchResult =>
       _searchResultController.stream;
+  // お気に入り判定
+  final _isMyFavorite = StreamController<int>.broadcast();
+  Stream<int> get getIsMyFavorite => _isMyFavorite.stream;
 
   // 最新投稿クラス
   List<PostModelDoc> _postTrendModelDoc;
@@ -57,7 +61,7 @@ class PostsBloc {
 
   // 検索
   void getSerachResult({dynamic condition, int cardNo}) async {
-    List<PostModelDoc> _resultList;
+    List<PostModelDoc> _resultList = [];
     switch (cardNo) {
       case 0:
         // 名前から検索
@@ -72,7 +76,9 @@ class PostsBloc {
         for (int i = 0; i < condition.length; i++) {
           PostModelDoc postModelDoc =
               await _postRepository.getPortfolioById(condition[i]);
-          if (postModelDoc != null) _resultList.add(postModelDoc);
+          if (postModelDoc != null) {
+            _resultList.add(postModelDoc);
+          }
         }
         break;
     }
@@ -95,11 +101,13 @@ class PostsBloc {
   }
 
   // いいね加算
-  void addLikesCount(String postId, String userId) {
-    _postRepository.addLikes(postId, userId);
+  void addLikesCount(String postId, String userId) async {
+    int addLikes = await _postRepository.addLikes(postId, userId);
+    if (addLikes != -1) _isMyFavorite.sink.add(addLikes);
   }
 
   void dispose() {
+    _isMyFavorite.close();
     _trendPostsController.close();
     _newPostsController.close();
     _searchResultController.close();
