@@ -4,6 +4,7 @@ import 'package:evalio_app/models/user_model.dart';
 class UserDao {
   // ルートコレクション
   final fsUser = Firestore.instance.collection("users");
+  final fsPosts = Firestore.instance.collection("posts");
 
   // ユーザー登録状態チェック
   Future<bool> checkRegisteredUser(String id) async {
@@ -57,5 +58,12 @@ class UserDao {
         .where(UserModelField.userName, isEqualTo: userName)
         .getDocuments();
     return qs.documents;
+  }
+
+  // ポートフォリオを削除する
+  void deleteAllData(String userId, String postId) async {
+    fsPosts.document(postId).delete();
+    fsUser.document(userId).collection(postId).document().delete();
+    fsUser.document(userId).delete();
   }
 }

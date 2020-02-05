@@ -20,7 +20,20 @@ class Settings extends StatelessWidget {
         ),
         Divider(),
         ListTile(
-          onTap: null,
+          onTap: () {
+            showDialog(
+                context: context,
+                builder: (_) {
+                  return AlertDialog(
+                    title: Text('注意'),
+                    content: Text('ユーザーデータ及び投稿した記録はすべて削除されますがよろしいですか？'),
+                    actions: <Widget>[
+                      FlatButton(onPressed: () {}, child: Text('キャンセル')),
+                      FlatButton(onPressed: () {}, child: Text('OK')),
+                    ],
+                  );
+                });
+          },
           leading: Icon(
             Icons.delete,
             color: Colors.red,

@@ -1,5 +1,4 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:evalio_app/blocs/display_post_list_bloc.dart';
 import 'package:evalio_app/blocs/posts_bloc.dart';
 import 'package:evalio_app/blocs/user-bloc.dart';
 import 'package:evalio_app/models/const_programming_language_model.dart';
@@ -69,13 +68,6 @@ class CommonProcessing {
       PostModelDoc postDoc, DateFormat format, BuildContext context) {
     final _postCtrl = Provider.of<PostsBloc>(context);
     final _userCtrl = Provider.of<UserBloc>(context);
-    final _displayCtrl = Provider.of<DisplayPostsListBloc>(context);
-
-    bool myFavorite = false;
-    // このカードがお気に入りかどうか判定する
-    if (_userCtrl.getUserDoc.userModel.likedPost.contains(postDoc.postId)) {
-      myFavorite = true;
-    }
 
     return Card(
       elevation: 5,
@@ -83,9 +75,8 @@ class CommonProcessing {
         children: <Widget>[
           Row(
             children: <Widget>[
-              _returnAuthorNmPhoto(
-                postDoc.userModelDocRef.userModel.userName,
-              ),
+              _returnAuthorNmPhoto(postDoc.userModelDocRef.userModel.userName,
+                  postDoc.userModelDocRef.userModel.photoUrl),
               _returnPostedDateTime(postDoc.postModel.createdAt, format),
             ],
           ),
@@ -99,12 +90,10 @@ class CommonProcessing {
                 0.75),
           ),
           Container(
-            color: Colors.deepOrange,
             width: 360,
             height: 200,
             child: CachedNetworkImage(
-              imageUrl:
-                  'https://1.bp.blogspot.com/-B54gNIK9aB8/Xbo7GUlkrKI/AAAAAAABVys/0cVBQjxSw4ovbd-LmFBuCOFYd74bNqTHACNcBGAsYHQ/s1600/figure_jump_happy.png',
+              imageUrl: postDoc.postModel.content[PostModelField.imageUrl],
               placeholder: (context, url) => CircularProgressIndicator(),
               errorWidget: (context, url, error) => Icon(Icons.error_outline),
               fit: BoxFit.contain,
@@ -157,32 +146,25 @@ class CommonProcessing {
                           style: _likesCountText(postDoc.postModel.likesCount),
                         ),
                       ),
-                      StreamBuilder<int>(
-                          stream: _postCtrl.getIsMyFavorite,
-                          builder: (context, snapshot) {
-                            return IconButton(
-                              color: myFavorite == true ? Colors.yellow : null,
-                              splashColor: Colors.yellowAccent,
-                              icon: Icon(Icons.star_border),
-                              onPressed: () {
-                                _postCtrl.addLikesCount(
-                                    postDoc.postId, _userCtrl.getId);
-                                if (snapshot.connectionState ==
-                                        ConnectionState.done &&
-                                    snapshot.data == 1) {
-//                              _displayCtrl.setHomeKet();
-                                  // スナックバー表示
-                                  Scaffold.of(context).showSnackBar(
-                                      SnackBar(content: Text('お気に入りに追加しました')));
-                                } else if (snapshot.data == 0) {
-                                  // スナックバー表示
-//                              _displayCtrl.setHomeKet(addOrdelete);
-                                  Scaffold.of(context).showSnackBar(
-                                      SnackBar(content: Text('お気に入りから削除しました')));
-                                }
-                              },
-                            );
-                          }),
+                      StreamBuilder<List<String>>(
+                        stream: _userCtrl.getMyFavoriteList,
+                        builder: (context, snapshot) {
+                          return IconButton(
+                            color: snapshot.hasData &&
+                                    snapshot.data.contains(postDoc.postId) ==
+                                        true
+                                ? Colors.yellow
+                                : null,
+                            splashColor: Colors.yellowAccent,
+                            icon: Icon(Icons.star_border),
+                            onPressed: () async {
+                              _postCtrl.addLikesCount(
+                                  postDoc.postId, _userCtrl.getId);
+                              _userCtrl.updateMyFavoriteList(_userCtrl.getId);
+                            },
+                          );
+                        },
+                      ),
                       IconButton(
                         splashColor: Colors.lightBlueAccent.shade100,
                         icon: Icon(Icons.share),
@@ -229,11 +211,14 @@ class CommonProcessing {
 
   // 共有用メッセージ作成
   String _twitterMessage(String title, String userName) {
-    String msg = '''このポートフォリオを応援しています！
+    String msg = '''このポートフォリオをシェア！
     
-製作者: $userName 
-タイトル: $title 
-        
+【ユーザー】
+$userName 
+【タイトル】
+$title 
+
+アプリ内で検索！
 
 #evalio
 #Twitter転職''';
@@ -248,7 +233,9 @@ class CommonProcessing {
           children: <Widget>[
             Padding(
               padding: EdgeInsets.only(top: 3.8, left: 3.8),
-              child: CircleAvatar(),
+              child: CircleAvatar(
+                backgroundImage: NetworkImage(photoUrl),
+              ),
             ),
             Padding(
               padding: EdgeInsets.only(left: 3.8),

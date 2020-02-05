@@ -9,9 +9,6 @@ class PostsDao {
 
   final fsUsers = Firestore.instance.collection("users");
 
-  // バッチ処理用
-  final batch = Firestore.instance.batch();
-
   // 最大10件
   final int maxKensu = 10;
 
@@ -76,6 +73,8 @@ class PostsDao {
   void insertPortfolio(PostModelDoc postModelDoc, String userId) async {
     // ユーザーIDへの参照
     var userRef = fsUsers.document(userId);
+    // バッチ処理用
+    var batch = Firestore.instance.batch();
 
     if (postModelDoc.postId == null) {
       // uuid生成
@@ -91,6 +90,7 @@ class PostsDao {
           PostModelField.title: postModelDoc.postModel.title,
           PostModelField.portfolioUrl: postModelDoc.postModel.portfolioUrl,
           PostModelField.imageUrl: postModelDoc.postModel.imageUrl,
+          PostModelField.imageName: postModelDoc.postModel.imageName,
           PostModelField.overview: postModelDoc.postModel.overview,
           PostModelField.programmingLanguage:
               postModelDoc.postModel.programmingLanguage,
@@ -111,6 +111,7 @@ class PostsDao {
           PostModelField.title: postModelDoc.postModel.title,
           PostModelField.imageUrl: postModelDoc.postModel.imageUrl,
           PostModelField.portfolioUrl: postModelDoc.postModel.portfolioUrl,
+          PostModelField.imageName: postModelDoc.postModel.imageName,
           PostModelField.overview: postModelDoc.postModel.overview,
           PostModelField.programmingLanguage:
               postModelDoc.postModel.programmingLanguage,
@@ -136,6 +137,7 @@ class PostsDao {
               PostModelField.title: postModelDoc.postModel.title,
               PostModelField.imageUrl: postModelDoc.postModel.imageUrl,
               PostModelField.portfolioUrl: postModelDoc.postModel.portfolioUrl,
+              PostModelField.imageName: postModelDoc.postModel.imageName,
               PostModelField.overview: postModelDoc.postModel.overview,
               PostModelField.programmingLanguage:
                   postModelDoc.postModel.programmingLanguage,
@@ -159,6 +161,7 @@ class PostsDao {
               PostModelField.title: postModelDoc.postModel.title,
               PostModelField.imageUrl: postModelDoc.postModel.imageUrl,
               PostModelField.portfolioUrl: postModelDoc.postModel.portfolioUrl,
+              PostModelField.imageName: postModelDoc.postModel.imageName,
               PostModelField.overview: postModelDoc.postModel.overview,
               PostModelField.programmingLanguage:
                   postModelDoc.postModel.programmingLanguage,
@@ -175,37 +178,64 @@ class PostsDao {
     }
   }
 
+  // サブコレクションにユーザーIDを追加し、お気に入り機能を実装する
+  Future<List<DocumentSnapshot>> addLikesCollection(
+      String postId, String userId) async {
+    fsPosts
+        .document(postId)
+        .collection('likesCount')
+        .document(userId)
+        .setData({'id': userId}, merge: true);
+    QuerySnapshot qs =
+        await fsPosts.document(postId).collection('likesCount').getDocuments();
+    return qs.documents;
+  }
+
+  // サブコレクションにユーザーIDを追加し、お気に入り機能を実装する
+  Future<List<DocumentSnapshot>> removeLikesCollection(
+      String postId, String userId) async {
+    fsPosts.document(postId).collection('likesCount').document().setData({
+      PostModelField.likesCount: FieldValue.arrayUnion([userId])
+    }, merge: true);
+  }
+
   // いいねをカウントし、お気に入りに追加・削除する
   Future<int> addLikesCount(String postId, String userId) async {
+    // バッチ処理用
+    var batch = Firestore.instance.batch();
     // true: 追加
     // false: 削除
     int isAdd = -1;
     var postRef = fsPosts.document(postId);
-    DocumentSnapshot postDoc = await postRef.get();
-    int likesCount = await postDoc.data[PostModelField.likesCount];
     var userRef = fsUsers.document(userId);
     DocumentSnapshot doc = await userRef.get();
     List likedPost = await doc.data[UserModelField.likedPost];
 
     // 登録処理
-    if (likedPost.contains(postId)) {
-      batch.updateData(postRef, {PostModelField.likesCount: likesCount + 1});
+    if (likedPost.contains(postId) == false) {
+      batch.updateData(
+          postRef, {PostModelField.likesCount: FieldValue.increment(1)});
       batch.updateData(userRef, {
         UserModelField.likedPost: FieldValue.arrayUnion([postId])
       });
-      batch.commit().then((voidValue) {
-        isAdd = 1;
-        return isAdd;
-      });
+      batch.commit();
+      isAdd = 1;
+      return isAdd;
     } else {
-      batch.updateData(postRef, {PostModelField.likesCount: likesCount - 1});
+      batch.updateData(
+          postRef, {PostModelField.likesCount: FieldValue.increment(-1)});
       batch.updateData(userRef, {
         UserModelField.likedPost: FieldValue.arrayRemove([postId])
       });
-      batch.commit().then((voidValue) {
-        isAdd = 0;
-        return isAdd;
-      });
+      batch.commit();
+      isAdd = 0;
+      return isAdd;
     }
+  }
+
+  // ポートフォリオを削除する
+  void deleteMyPortfolio(String userId, String postId) {
+    fsPosts.document(postId).delete();
+    fsUsers.document(userId).collection(postId).document().delete();
   }
 }

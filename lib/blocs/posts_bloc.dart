@@ -21,7 +21,7 @@ class PostsBloc {
   Stream<List<PostModelDoc>> get getSearchResult =>
       _searchResultController.stream;
   // お気に入り判定
-  final _isMyFavorite = StreamController<int>.broadcast();
+  final _isMyFavorite = StreamController<int>();
   Stream<int> get getIsMyFavorite => _isMyFavorite.stream;
 
   // 最新投稿クラス
@@ -37,9 +37,6 @@ class PostsBloc {
     getTrendPostsList();
     getNewPostsList();
   }
-
-  // 自分が投稿したポートフォリオを取得
-  void getMyPortfolio() async {}
 
   //　トレンド取得
   void getTrendPostsList() async {
@@ -92,12 +89,13 @@ class PostsBloc {
     List<String> langNames,
     File file,
     String portfolioUrl,
+    String imageName,
     String overview,
     String details,
     String userId,
   ) async {
     _postRepository.addPortfolio(postId, title, langNames, file, portfolioUrl,
-        overview, details, userId);
+        imageName, overview, details, userId);
   }
 
   // いいね加算
@@ -106,6 +104,12 @@ class PostsBloc {
     if (addLikes != -1) _isMyFavorite.sink.add(addLikes);
   }
 
+  // 投稿削除
+  void deletePOrtfolio(String userId, String postId) {
+    _postRepository.delete(userId, postId);
+  }
+
+  // コントローラーの破棄
   void dispose() {
     _isMyFavorite.close();
     _trendPostsController.close();

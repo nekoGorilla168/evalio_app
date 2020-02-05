@@ -18,6 +18,9 @@ class UserBloc {
   // ユーザーId
   final _idController = StreamController<String>.broadcast();
   Stream<String> get getIds => _idController.stream;
+  // お気に入りのリスト
+  final _myFavoriteList = StreamController<List<String>>.broadcast();
+  Stream<List<String>> get getMyFavoriteList => _myFavoriteList.stream;
 
   // ユーザーID保持
   String _id = "";
@@ -74,6 +77,7 @@ class UserBloc {
     if (userModelDoc != null) _userController.sink.add(userModelDoc);
     _userModelDoc = userModelDoc;
     _myFavorites = userModelDoc.userModel.likedPost.cast<String>();
+    _myFavoriteList.sink.add(userModelDoc.userModel.likedPost.cast<String>());
     if (userModelDoc.postModelDoc != null) {
       _postId = userModelDoc.postModelDoc.postId;
     }
@@ -83,6 +87,15 @@ class UserBloc {
   void updateUserProfile(String userId, String introducation, String interest) {
     _userRepositpry.updateUser(userId, introducation, interest);
     getUserInfo(userId);
+  }
+
+  // お気に入りのリストリストを更新する
+  void updateMyFavoriteList(String userId) async {
+    List<String> likedList = await _userRepositpry.getMyFavoriteList(userId);
+    if (likedList != null) {
+      _myFavoriteList.sink.add(likedList);
+      _myFavorites = likedList;
+    }
   }
 
   // ユーザーIDをセットする
@@ -109,5 +122,6 @@ class UserBloc {
   void dispose() {
     _idController.close();
     _userController.close();
+    _myFavoriteList.close();
   }
 }
