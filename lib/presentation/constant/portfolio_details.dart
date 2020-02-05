@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:evalio_app/blocs/posts_bloc.dart';
 import 'package:evalio_app/blocs/user-bloc.dart';
 import 'package:evalio_app/models/const_programming_language_model.dart';
 import 'package:evalio_app/models/posts_model.dart';
@@ -12,6 +13,10 @@ import 'package:url_launcher/url_launcher.dart';
 class PortfolioDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    // 投稿への操作
+    final _postCtrl = Provider.of<PostsBloc>(context);
+    // ユーザー情報取得
+    final _userCtrl = Provider.of<UserBloc>(context);
     // 遷移時の値受け渡し
     UserModelDoc userInfo = ModalRoute.of(context).settings.arguments;
 
@@ -27,6 +32,21 @@ class PortfolioDetails extends StatelessWidget {
               body: SingleChildScrollView(
                 child: Column(
                   children: <Widget>[
+                    // ログインユーザーIDとポートフォリオのIDが同じかどうか
+                    _userCtrl.getPostId == userInfo.postModelDoc.postId
+                        ? Container(
+                            alignment: Alignment.topRight,
+                            child: FlatButton.icon(
+                              onPressed: () {
+                                _postCtrl.deletePOrtfolio(_userCtrl.getId,
+                                    userInfo.postModelDoc.postId);
+                                _userCtrl.getUserInfo(_userCtrl.getId);
+                              },
+                              icon: Icon(Icons.navigate_next),
+                              label: Text('削除する'),
+                            ),
+                          )
+                        : Container(),
                     // 投稿ユーザー情報
                     postUserInfo(context, userInfo),
                     // 投稿日・更新日
@@ -92,8 +112,8 @@ class PortfolioDetails extends StatelessWidget {
     return InkWell(
       onTap: () {
         if (_userCtrl.getId != userModelDoc.userId) {
-          Navigator.of(context).pushNamed('/otherUserProfile',
-              arguments: userModelDoc);
+          Navigator.of(context)
+              .pushNamed('/otherUserProfile', arguments: userModelDoc);
         }
       },
       child: Container(
@@ -109,7 +129,7 @@ class PortfolioDetails extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     image:
-                        DecorationImage(image: imgProvider, fit: BoxFit.fill),
+                        DecorationImage(image: imgProvider, fit: BoxFit.cover),
                   ),
                 ),
                 placeholder: (context, img) => CircularProgressIndicator(),
@@ -197,7 +217,7 @@ class PortfolioDetails extends StatelessWidget {
   Widget _displayPhotoField(String imageUrl) {
     return Container(
       padding: EdgeInsets.only(top: 5.0, bottom: 10.0),
-      width: 330,
+      width: 360,
       height: 200,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(8.0),
@@ -207,7 +227,7 @@ class PortfolioDetails extends StatelessWidget {
               CircularProgressIndicator(),
           errorWidget: (BuildContext context, url, error) =>
               Icon(Icons.error_outline),
-          fit: BoxFit.fill,
+          fit: BoxFit.contain,
         ),
       ),
     );

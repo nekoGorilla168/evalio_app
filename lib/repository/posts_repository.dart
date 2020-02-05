@@ -143,16 +143,17 @@ class PostsRepositpry {
       List<String> langNames,
       File file,
       String portfplioUrl,
+      String imageName,
       String overview,
       String details,
       String userId) async {
     // ストレージのチェック
     bool isExist = _storage.checkMyStorage(userId);
     if (isExist) {
-      _storage.deleteImage(userId);
+      _storage.deleteImageFolder(userId, imageName);
     }
     // 画像をストレージへ保存し、ダウンロードURLを取得する
-    String imageUrl = await _storage.uploadImage(file, userId);
+    Map<String, String> imageInfo = await _storage.uploadImage(file, userId);
     // 言語名からKeyを取得する
     List<String> langKey = [];
     ProgrammingLangMap.plMap.forEach((key, value) {
@@ -166,7 +167,8 @@ class PostsRepositpry {
             PostModel(
                 title: title,
                 programmingLanguage: langKey,
-                imageUrl: imageUrl,
+                imageUrl: imageInfo['url'],
+                imageName: imageInfo['name'],
                 portfolioUrl: portfplioUrl,
                 overview: overview,
                 details: details)),
@@ -177,4 +179,8 @@ class PostsRepositpry {
   Future<int> addLikes(String postId, String userId) async {
     return await _postDao.addLikesCount(postId, userId);
   }
+
+  // ポートフォリオの削除
+  void delete(String userId, String postId) =>
+      _postDao.deleteMyPortfolio(userId, postId);
 }

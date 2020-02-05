@@ -4,10 +4,13 @@ import 'package:firebase_storage/firebase_storage.dart';
 
 // FirebaseStorqageを使用するクラス
 class FireStorage {
+  final FirebaseStorage storage =
+      FirebaseStorage(storageBucket: 'gs://evalio-app-project.appspot.com/');
+
   // 自分のストレージがあるか確認する
   bool checkMyStorage(String userId) {
     bool isMyStorage = false;
-    StorageReference ref = FirebaseStorage().ref().child('$userId/');
+    StorageReference ref = storage.ref().child('$userId/');
     if (ref != null) {
       isMyStorage = true;
     }
@@ -15,11 +18,11 @@ class FireStorage {
   }
 
   // ファイルをアップロードするメソッド
-  Future<String> uploadImage(File file, String userId) async {
+  Future<Map<String, String>> uploadImage(File file, String userId) async {
     int timestamp = DateTime.now().millisecondsSinceEpoch;
     String subDirectoryName = userId;
     final StorageReference ref =
-        FirebaseStorage().ref().child(subDirectoryName).child('$timestamp');
+        storage.ref().child(subDirectoryName).child('$timestamp');
 
     final StorageUploadTask uploadTask = ref.putFile(
         file,
@@ -28,10 +31,11 @@ class FireStorage {
         ));
     StorageTaskSnapshot snapshot = await uploadTask.onComplete;
     if (snapshot.error == null) {
-      return await snapshot.ref.getDownloadURL();
-    } else {
-      return 'something goes wrong';
-    }
+      return <String, String>{
+        'url': await snapshot.ref.getDownloadURL(),
+        'name': timestamp.toString()
+      };
+    } else {}
   }
 
   // ファイルを削除するメソッド
@@ -43,6 +47,15 @@ class FireStorage {
     // 削除処理実行
     if (deleteRef != null) deleteRef.delete();
 
+    return isSuccess;
+  }
+
+  // 削除するメソッド
+  Future<bool> deleteImageFolder(String userId, String imageName) async {
+    bool isSuccess = false;
+    storage.ref().child('$userId/').child(imageName).delete().then((success) {
+      isSuccess = true;
+    }).catchError((error) {});
     return isSuccess;
   }
 }

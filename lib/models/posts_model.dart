@@ -27,6 +27,7 @@ class PostModel {
   Map content; // 投稿内容
   Map postUserInfo; // 投稿したユーザー情報
   String imageUrl; // サムネイル画像ダウンロードURL
+  String imageName;
   String overview; // アプリケーションの概要
   String details; // アプリケーションの詳細
 
@@ -35,6 +36,7 @@ class PostModel {
       {this.title,
       this.programmingLanguage,
       this.imageUrl,
+      this.imageName,
       this.portfolioUrl,
       this.overview,
       this.details});
@@ -72,5 +74,6 @@ class PostModelField {
   static const createdAt = "createdAt";
   static const updatedAt = "updatedAt";
   static const imageUrl = "imageUrl";
+  static const imageName = 'imageName';
   static const programmingLanguage = "programmingLanguage";
 }
