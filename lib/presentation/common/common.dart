@@ -110,7 +110,7 @@ class CommonProcessing {
                       postDoc.userModelDocRef.userModel, postDoc));
             },
             child: Container(
-              width: 360,
+              width: MediaQuery.of(context).size.width,
               child: Column(
                 children: <Widget>[
                   Padding(
