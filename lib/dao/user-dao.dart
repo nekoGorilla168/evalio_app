@@ -42,7 +42,8 @@ class UserDao {
         UserModelField.interest: profile[UserModelField.interest],
         UserModelField.selfIntroducation:
             profile[UserModelField.selfIntroducation],
-      }
+      },
+      UserModelField.twitterLink: profile[UserModelField.twitterLink],
     });
   }
 
@@ -60,7 +61,7 @@ class UserDao {
     return qs.documents;
   }
 
-  // ポートフォリオを削除する
+  // 全てのデータを削除する
   void deleteAllData(String userId, String postId) async {
     fsPosts.document(postId).delete();
     fsUser.document(userId).collection(postId).document().delete();

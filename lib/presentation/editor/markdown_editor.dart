@@ -1,3 +1,5 @@
+import 'dart:html';
+
 import 'package:evalio_app/blocs/markdown_bloc.dart';
 import 'package:evalio_app/blocs/posts_bloc.dart';
 import 'package:evalio_app/blocs/user-bloc.dart';
@@ -44,8 +46,8 @@ class DescriptionPortfolioEditor extends StatelessWidget {
             ListView(
               children: <Widget>[
                 //
-//                    _applicationTitleInputArea(),
-                InputAppTitle(),
+                _applicationTitleInputArea(),
+//                InputAppTitle(),
                 Divider(
                   color: Colors.grey,
                 ),
@@ -168,9 +170,9 @@ class DescriptionPortfolioEditor extends StatelessWidget {
 
   // アプリのタイトルの入力域
   Widget _applicationTitleInputArea() {
-    return Container(
-      child: Consumer<MarkDownBloc>(builder: (_, bloc, __) {
-        print('タイトル入力エリア');
+    return Container(child: Builder(
+      builder: (BuildContext context) {
+        final _markdownCtrl = Provider.of<MarkDownBloc>(context);
         return TextFormField(
           keyboardType: TextInputType.multiline,
           minLines: 1,
@@ -186,19 +188,19 @@ class DescriptionPortfolioEditor extends StatelessWidget {
               hintText: '書籍管理共有アプリケーション',
               labelText: 'アプリケーショ名(タイトル)'),
           onChanged: (String data) {
-            bloc.setAppTitle(data);
+            _markdownCtrl.setAppTitle(data);
           },
         );
-      }),
-    );
+      },
+    ));
   }
 
   // フィルターチップのリストを返す
   List<Widget> _getFilterChipList(MarkDownBloc bloc) {
     List<Widget> filterChipList = ProgrammingLangMap.pLangNames.map((pLName) {
       return Transform.scale(
-          scale: 0.85,
-          child: FilterChip(
+        scale: 0.85,
+        child: FilterChip(
             label: Text(pLName),
             selected: bloc.getFilters.contains(pLName),
             backgroundColor: Colors.blueGrey.shade100,
@@ -210,10 +212,9 @@ class DescriptionPortfolioEditor extends StatelessWidget {
               } else {
                 bloc.removeFilters(pLName);
               }
-            },
-          ));
+            }),
+      );
     }).toList();
-
     return filterChipList;
   }
 
@@ -398,6 +399,7 @@ class DescriptionPortfolioEditor extends StatelessWidget {
   Widget _overviewTitle() {
     final _overviewStyle = TextStyle(
         fontSize: 28.0,
+        fontWeight: FontWeight.bold,
         decoration: TextDecoration.underline,
         decorationStyle: TextDecorationStyle.dotted);
     return Container(
@@ -412,7 +414,7 @@ class DescriptionPortfolioEditor extends StatelessWidget {
   // アプリケーション概要の本文を表示
   Widget _displayOverview(double width, String overview) {
     return Container(
-      padding: EdgeInsets.only(left: 10.0),
+      padding: EdgeInsets.all(10.0),
       width: width,
       child: Text(overview),
     );
@@ -422,6 +424,7 @@ class DescriptionPortfolioEditor extends StatelessWidget {
   Widget _detailsTitle() {
     final _detailsStyle = TextStyle(
         fontSize: 28.0,
+        fontWeight: FontWeight.bold,
         decoration: TextDecoration.underline,
         decorationStyle: TextDecorationStyle.dotted);
     return Container(
@@ -436,39 +439,11 @@ class DescriptionPortfolioEditor extends StatelessWidget {
   // アプリケーション詳細の表示
   Widget _displayDetails(double width, String details) {
     return Container(
-      padding: EdgeInsets.only(left: 10.0),
+      padding: EdgeInsets.all(10.0),
       width: width,
       child: MarkdownBody(
         data: details,
       ),
     );
-  }
-}
-
-//
-class InputAppTitle extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final _markdownCtrl = Provider.of<MarkDownBloc>(context, listen: false);
-    print('タイトル入力エリア');
-    return Container(
-        child: TextFormField(
-      keyboardType: TextInputType.multiline,
-      minLines: 1,
-      maxLines: 2,
-      maxLength: 30,
-      decoration: InputDecoration(
-          hintMaxLines: 30,
-          border: UnderlineInputBorder(),
-          icon: Icon(
-            Icons.web,
-            color: Colors.blueAccent,
-          ),
-          hintText: '書籍管理共有アプリケーション',
-          labelText: 'アプリケーショ名(タイトル)'),
-      onChanged: (String data) {
-        _markdownCtrl.setAppTitle(data);
-      },
-    ));
   }
 }

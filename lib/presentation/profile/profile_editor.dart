@@ -42,8 +42,11 @@ class ProfileEditor extends StatelessWidget {
                   children: <Widget>[
                     FlatButton.icon(
                       onPressed: () {
-                        _userCtrl.updateUserProfile(userInfo.userId,
-                            _userCtrl.getIntroducation, _userCtrl.getInterest);
+                        _userCtrl.updateUserProfile(
+                            userInfo.userId,
+                            _userCtrl.getIntroducation,
+                            _userCtrl.getInterest,
+                            _userCtrl.getTwitterLink);
                         // スナックバー表示
                         _key.currentState.showSnackBar(
                             const SnackBar(content: Text('プロフィールを更新しました。')));

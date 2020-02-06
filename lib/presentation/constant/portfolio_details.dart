@@ -244,6 +244,7 @@ class PortfolioDetails extends StatelessWidget {
         } else {}
       },
       child: Container(
+        alignment: Alignment.center,
         child: Text(
           portfolioUrl,
           style: _portfolioUrlStyle,
@@ -258,7 +259,8 @@ class PortfolioDetails extends StatelessWidget {
       children: <Widget>[
         Icon(
           Icons.star,
-          color: Colors.yellowAccent,
+          color: Colors.amber,
+          size: 30.0,
         ),
         Text('$likesCount'),
       ],
@@ -269,6 +271,7 @@ class PortfolioDetails extends StatelessWidget {
   Widget _overviewTitle() {
     final _overviewStyle = TextStyle(
         fontSize: 28.0,
+        fontWeight: FontWeight.bold,
         decoration: TextDecoration.underline,
         decorationStyle: TextDecorationStyle.dotted);
     return Container(
@@ -283,7 +286,7 @@ class PortfolioDetails extends StatelessWidget {
   // アプリケーション概要の本文を表示
   Widget _displayOverview(BuildContext context, String overview) {
     return Container(
-      padding: EdgeInsets.only(left: 10.0),
+      padding: EdgeInsets.all(10.0),
       width: MediaQuery.of(context).size.width,
       child: Text(overview),
     );
@@ -293,6 +296,7 @@ class PortfolioDetails extends StatelessWidget {
   Widget _detailsTitle() {
     final _detailsStyle = TextStyle(
         fontSize: 28.0,
+        fontWeight: FontWeight.bold,
         decoration: TextDecoration.underline,
         decorationStyle: TextDecorationStyle.dotted);
     return Container(
@@ -304,10 +308,10 @@ class PortfolioDetails extends StatelessWidget {
     );
   }
 
-  // アプリケーション詳細の
+  // アプリケーション詳細
   Widget _displayDetails(BuildContext context, String details) {
     return Container(
-      padding: EdgeInsets.only(left: 10.0),
+      padding: EdgeInsets.all(10.0),
       width: MediaQuery.of(context).size.width,
       child: MarkdownBody(
         data: details,

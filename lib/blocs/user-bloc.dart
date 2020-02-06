@@ -84,8 +84,9 @@ class UserBloc {
   }
 
   // ユーザープロフィールを更新する
-  void updateUserProfile(String userId, String introducation, String interest) {
-    _userRepositpry.updateUser(userId, introducation, interest);
+  void updateUserProfile(String userId, String introducation, String interest,
+      String twitterLink) {
+    _userRepositpry.updateUser(userId, introducation, interest, twitterLink);
     getUserInfo(userId);
   }
 
