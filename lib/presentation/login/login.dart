@@ -1,12 +1,15 @@
 import 'package:evalio_app/blocs/user-bloc.dart';
-import 'package:evalio_app/models/user_model.dart';
 import 'package:evalio_app/presentation/home/evalio_home.dart';
 import 'package:evalio_app/repository/base_auth_repository.dart';
+import 'package:evalio_app/repository/users_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class LoggedIn extends StatelessWidget {
+  // 認証操作
   final _authRepository = AuthRepository();
+  // ユーザー情報更新
+  final _userRepository = UserRepository();
 
   @override
   Widget build(BuildContext context) {
@@ -30,19 +33,21 @@ class LoggedIn extends StatelessWidget {
               ),
               onPressed: () async {
                 // ログイン情報取得
-                UserModel userModel =
-                    await _authRepository.getFromFirebaseAuth();
-                bool isLogin =
-                    await _authRepository.checkLoginRireki(userModel.userId);
-                if (isLogin) {
-                  Navigator.pop(
-                      context,
-                      MaterialPageRoute(
+                _authRepository.getFromFirebaseAuth().then((userModel) {
+                  _authRepository
+                      .checkLoginRireki(userModel.userId)
+                      .then((isLoggedIn) {
+                    if (isLoggedIn == true) {
+                      // ユーザー情報を更新し、ログインする
+                      _userRepository.updateUserInfo(userModel);
+                      Navigator.of(context).pushReplacement(MaterialPageRoute(
                           builder: (context) => Home(userModel.userId)));
-                } else {
-                  _ctrlUser.shinkiToroku(userModel);
-                  Navigator.popAndPushNamed(context, '/home');
-                }
+                    } else {
+                      _ctrlUser.shinkiToroku(userModel);
+                      Navigator.popAndPushNamed(context, '/home');
+                    }
+                  });
+                });
               },
             ),
           ],

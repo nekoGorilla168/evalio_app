@@ -66,10 +66,6 @@ class Settings extends StatelessWidget {
           title: Text('アカウント削除'),
         ),
         Divider(),
-//        ListTile(
-//          title: Text('a'),
-//        ),
-//        Divider(),
       ],
     );
   }

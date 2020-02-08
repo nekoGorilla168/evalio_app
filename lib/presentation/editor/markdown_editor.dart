@@ -1,5 +1,3 @@
-import 'dart:html';
-
 import 'package:evalio_app/blocs/markdown_bloc.dart';
 import 'package:evalio_app/blocs/posts_bloc.dart';
 import 'package:evalio_app/blocs/user-bloc.dart';
@@ -29,7 +27,7 @@ class DescriptionPortfolioEditor extends StatelessWidget {
         child: Scaffold(
           key: _key,
           appBar: AppBar(
-            title: const Text('Portfolio Editor'),
+            title: const Text('ポートフォリオ編集'),
             centerTitle: true,
             bottom: const TabBar(tabs: [
               Tab(
@@ -47,7 +45,6 @@ class DescriptionPortfolioEditor extends StatelessWidget {
               children: <Widget>[
                 //
                 _applicationTitleInputArea(),
-//                InputAppTitle(),
                 Divider(
                   color: Colors.grey,
                 ),
@@ -240,13 +237,12 @@ class DescriptionPortfolioEditor extends StatelessWidget {
   Widget _displayPhotoField(MarkDownBloc bloc) {
     return Container(
       width: 340,
-      height: 230,
       child: bloc.getImage != null
           ? ClipRRect(
               borderRadius: BorderRadius.circular(8.0),
               child: Image.file(
                 bloc.getImage,
-                fit: BoxFit.fill,
+                fit: BoxFit.cover,
               ),
             )
           : DecoratedBox(
