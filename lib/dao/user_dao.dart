@@ -10,10 +10,11 @@ class UserDao {
   Future<bool> checkRegisteredUser(String id) async {
     bool isExist = false;
 
-    DocumentSnapshot doc = await fsUser.document(id).get();
-    if (doc.data.length != 0) {
-      isExist = true;
-    }
+    fsUser.document(id).get().then((userData) {
+      if (userData.exists) {
+        isExist = true;
+      }
+    });
     return isExist;
   }
 
@@ -33,7 +34,13 @@ class UserDao {
   }
 
   // ユーザー情報更新
-  void updateUserInfo(UserModel userModel) {}
+  void updateUserInfo(UserModel userModel) {
+    fsUser.document(userModel.userId).setData({
+      UserModelField.userName: userModel.userName,
+      UserModelField.photoUrl: userModel.photoUrl,
+      UserModelField.updatedAt: new DateTime.now(),
+    }, merge: true);
+  }
 
   // ユーザープロフィール更新
   void updateProfile(String userId, Map<String, String> profile) {

@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:evalio_app/dao/posts_dao.dart';
-import 'package:evalio_app/dao/user-dao.dart';
+import 'package:evalio_app/dao/user_dao.dart';
 import 'package:evalio_app/firebase/firebase_storage.dart';
 import 'package:evalio_app/models/user_model.dart';
 
@@ -10,7 +10,7 @@ class UserRepository {
   final _userDao = UserDao();
   final _postDao = PostsDao();
 
-  // ユーザープロフィール
+  // ユーザープロフィール更新
   updateUser(String userId, String introducation, String interest,
       String twitterLink) {
     Map<String, String> profile = {
@@ -19,6 +19,11 @@ class UserRepository {
       UserModelField.twitterLink: twitterLink,
     };
     _userDao.updateProfile(userId, profile);
+  }
+
+  // ユーザー情報更新
+  updateUserInfo(UserModel userModel) {
+    _userDao.updateUserInfo(userModel);
   }
 
   // お気に入りのリストを更新する

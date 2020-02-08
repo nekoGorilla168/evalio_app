@@ -218,7 +218,6 @@ class PortfolioDetails extends StatelessWidget {
     return Container(
       padding: EdgeInsets.only(top: 5.0, bottom: 10.0),
       width: 360,
-      height: 200,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(8.0),
         child: CachedNetworkImage(
@@ -227,7 +226,7 @@ class PortfolioDetails extends StatelessWidget {
               CircularProgressIndicator(),
           errorWidget: (BuildContext context, url, error) =>
               Icon(Icons.error_outline),
-          fit: BoxFit.contain,
+          fit: BoxFit.cover,
         ),
       ),
     );
@@ -273,9 +272,10 @@ class PortfolioDetails extends StatelessWidget {
         fontSize: 28.0,
         fontWeight: FontWeight.bold,
         decoration: TextDecoration.underline,
-        decorationStyle: TextDecorationStyle.dotted);
+        decorationStyle: TextDecorationStyle.solid);
     return Container(
-      padding: EdgeInsets.only(top: 5.0, right: 220, bottom: 15.0),
+      alignment: Alignment.centerLeft,
+      padding: EdgeInsets.only(top: 5.0, left: 5.0, bottom: 15.0),
       child: Text(
         'Overview',
         style: _overviewStyle,
@@ -298,9 +298,10 @@ class PortfolioDetails extends StatelessWidget {
         fontSize: 28.0,
         fontWeight: FontWeight.bold,
         decoration: TextDecoration.underline,
-        decorationStyle: TextDecorationStyle.dotted);
+        decorationStyle: TextDecorationStyle.solid);
     return Container(
-      padding: EdgeInsets.only(top: 5.0, right: 250, bottom: 15.0),
+      alignment: Alignment.centerLeft,
+      padding: EdgeInsets.only(top: 5.0, left: 5.0, bottom: 15.0),
       child: Text(
         'Details',
         style: _detailsStyle,

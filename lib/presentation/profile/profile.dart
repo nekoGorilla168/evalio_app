@@ -58,7 +58,7 @@ class Profile extends StatelessWidget {
                       Navigator.pushNamed(context, '/details',
                           arguments: _ctrlUser.getUserDoc);
                     } else {
-                      Navigator.pushNamed(context, 'editor');
+                      Navigator.pushNamed(context, '/editor');
                     }
                   },
                   child: snapshot.data.postModelDoc == null
@@ -93,20 +93,25 @@ class Profile extends StatelessWidget {
             Divider(
               color: Colors.grey,
             ),
-            InkWell(
-              onTap: () async {
-                if (await canLaunch(userModel.twitterLink)) {
-                  await launch(userModel.twitterLink);
-                }
-              },
-              child: Container(
-                padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
-                child: Text(
-                  userModel.twitterLink,
-                  style: TextStyle(color: Colors.lightBlueAccent.shade100),
-                ),
-              ),
-            ),
+            userModel.twitterLink == null
+                ? Container(
+                    child: Text('まだTwitterへのリンクが貼られておりません'),
+                  )
+                : InkWell(
+                    onTap: () async {
+                      if (await canLaunch(userModel.twitterLink)) {
+                        await launch(userModel.twitterLink);
+                      }
+                    },
+                    child: Container(
+                      padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
+                      child: Text(
+                        userModel.twitterLink,
+                        style:
+                            TextStyle(color: Colors.lightBlueAccent.shade100),
+                      ),
+                    ),
+                  ),
           ],
         ),
       ),

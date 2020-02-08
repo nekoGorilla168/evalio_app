@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:evalio_app/dao/posts_dao.dart';
-import 'package:evalio_app/dao/user-dao.dart';
+import 'package:evalio_app/dao/user_dao.dart';
 import 'package:evalio_app/firebase/firebase_storage.dart';
 import 'package:evalio_app/models/const_programming_language_model.dart';
 import 'package:evalio_app/models/posts_model.dart';

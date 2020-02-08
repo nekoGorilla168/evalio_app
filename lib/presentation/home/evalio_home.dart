@@ -1,5 +1,4 @@
 import 'package:evalio_app/blocs/bottom-navibar-bloc.dart';
-import 'package:evalio_app/blocs/display_post_list_bloc.dart';
 import 'package:evalio_app/blocs/user-bloc.dart';
 import 'package:evalio_app/models/user_model.dart';
 import 'package:evalio_app/presentation/constant/posts_list_app_bar.dart';
@@ -75,7 +74,6 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // インデックスコントロール
-    final _displayPosListCtrl = Provider.of<DisplayPostsListBloc>(context);
     final _ctrlIndex = Provider.of<NavigationBarBloc>(context);
     final _ctrlUser = Provider.of<UserBloc>(context);
     if (id != null) {
@@ -83,15 +81,38 @@ class Home extends StatelessWidget {
       _ctrlUser.setUserId(id);
     }
 
-    return Scaffold(
-      appBar: _appBarList.elementAt(_ctrlIndex.getCurIndex),
-      body: IndexedStack(index: _ctrlIndex.getCurIndex, children: _pageWidgets),
-      floatingActionButton: _returnFloatingActBtn(
-          _ctrlIndex.getCurIndex, context, _ctrlUser.getUserDoc),
-      bottomNavigationBar: BottomNavibarConst(),
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('evalio'),
+          centerTitle: true,
+          actions: <Widget>[
+            StreamBuilder<UserModelDoc>(
+              stream: _ctrlUser.getUser,
+              builder: (context, snapsot) {
+                if (snapsot.hasData) {
+                  return CircleAvatar(
+                    child: ClipOval(
+                      child: Image.network(snapsot.data.userModel.photoUrl),
+                    ),
+                  );
+                } else {
+                  return CircleAvatar(
+                    child: Icon(Icons.person),
+                  );
+                }
+              },
+            ),
+          ],
+        ),
+        body:
+            IndexedStack(index: _ctrlIndex.getCurIndex, children: _pageWidgets),
+        floatingActionButton: _returnFloatingActBtn(
+            _ctrlIndex.getCurIndex, context, _ctrlUser.getUserDoc),
+        bottomNavigationBar: BottomNavibarConst(),
+      ),
     );
   }
-//  _displayPosListCtrl.getIsAddedMyFavorite == true ? _key.currentState.showSnackBar(SnackBar(content: Text('お気に入りに追加しました'))) : _key.currentState.showSnackBar(SnackBar(content: Text('お気に入りから削除しました')));
 }
 
 // ボトムナビバークラス

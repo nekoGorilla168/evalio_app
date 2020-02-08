@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:evalio_app/dao/posts_dao.dart';
-import 'package:evalio_app/dao/user-dao.dart';
+import 'package:evalio_app/dao/user_dao.dart';
 import 'package:evalio_app/firebase/firebase_auth.dart';
 import 'package:evalio_app/models/posts_model.dart';
 import 'package:evalio_app/models/user_model.dart';
@@ -34,11 +34,18 @@ class AuthRepository {
   }
 
   // FireAuthよりユーザー情報取得
-  Future getFromFirebaseAuth() async {
-    FirebaseUser fireUser = await fireAuth.signInTwitter();
-    return new UserModel(
-        userId: fireUser.uid,
-        userName: fireUser.displayName,
-        photoUrl: fireUser.photoUrl);
+  Future<UserModel> getFromFirebaseAuth() async {
+    Future<UserModel> userModel = fireAuth.signInTwitter().then((userInfo) {
+      String uid;
+      String userName;
+      String photoUrl;
+      for (UserInfo data in userInfo.providerData) {
+        uid = data.uid;
+        userName = data.displayName;
+        photoUrl = data.photoUrl;
+      }
+      return new UserModel(userId: uid, userName: userName, photoUrl: photoUrl);
+    });
+    return userModel;
   }
 }

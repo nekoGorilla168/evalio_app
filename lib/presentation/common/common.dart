@@ -96,7 +96,7 @@ class CommonProcessing {
               imageUrl: postDoc.postModel.content[PostModelField.imageUrl],
               placeholder: (context, url) => CircularProgressIndicator(),
               errorWidget: (context, url, error) => Icon(Icons.error_outline),
-              fit: BoxFit.contain,
+              fit: BoxFit.cover,
             ),
           ),
           Divider(
@@ -154,7 +154,7 @@ class CommonProcessing {
                                     snapshot.data.contains(postDoc.postId) ==
                                         true
                                 ? Colors.yellow
-                                : null,
+                                : Colors.black,
                             splashColor: Colors.yellowAccent,
                             icon: Icon(Icons.star_border),
                             onPressed: () async {
