@@ -13,6 +13,7 @@ class SearcResultPosts extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 投稿ブロック
     final _postCtrl = Provider.of<PostsBloc>(context);
 
     return SafeArea(
@@ -28,7 +29,14 @@ class SearcResultPosts extends StatelessWidget {
                 return Center(
                   child: CircularProgressIndicator(),
                 );
-              return common.postList(snapshot.data, _format, context);
+              return Container(
+                child: ListView.builder(
+                    itemCount: snapshot.data.length,
+                    itemBuilder: (context, index) {
+                      return common.createPostCard(
+                          snapshot.data[index], _format);
+                    }),
+              );
             },
           ),
         ),

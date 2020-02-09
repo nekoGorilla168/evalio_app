@@ -51,145 +51,123 @@ class CommonProcessing {
     }
   }
 
-  // 最新かトレンドを表示するメソッド
-  Widget postList(
-      List<PostModelDoc> postList, DateFormat format, BuildContext context) {
-    return Container(
-      child: ListView.builder(
-          itemCount: postList.length,
-          itemBuilder: (context, index) {
-            return _createPostCard(postList[index], format, context);
-          }),
-    );
-  }
-
   // カードを作成するメソッド
-  Widget _createPostCard(
-      PostModelDoc postDoc, DateFormat format, BuildContext context) {
-    final _postCtrl = Provider.of<PostsBloc>(context);
-    final _userCtrl = Provider.of<UserBloc>(context);
+  Widget createPostCard(PostModelDoc postDoc, DateFormat format) {
+    return Builder(builder: (BuildContext context) {
+      final _postCtrl = Provider.of<PostsBloc>(context);
+      final _userCtrl = Provider.of<UserBloc>(context);
 
-    return Card(
-      elevation: 5,
-      child: Column(
-        children: <Widget>[
-          Row(
-            children: <Widget>[
-              _returnAuthorNmPhoto(postDoc.userModelDocRef.userModel.userName,
-                  postDoc.userModelDocRef.userModel.photoUrl),
-              _returnPostedDateTime(postDoc.postModel.createdAt, format),
-            ],
-          ),
-          Wrap(
-            runSpacing: 2.0,
-            spacing: -6.0,
-            alignment: WrapAlignment.start,
-            children: createChipList(
-                postDoc.postModel.content[PostModelField.programmingLanguage]
-                    .cast<String>(),
-                0.75),
-          ),
-          Container(
-            width: 360,
-            height: 200,
-            child: CachedNetworkImage(
-              imageUrl: postDoc.postModel.content[PostModelField.imageUrl],
-              placeholder: (context, url) => CircularProgressIndicator(),
-              errorWidget: (context, url, error) => Icon(Icons.error_outline),
-              fit: BoxFit.cover,
+      return Card(
+        elevation: 5,
+        child: Column(
+          children: <Widget>[
+            Row(
+              children: <Widget>[
+                // 投稿者名とアバターを表示する
+                _returnAuthorNmPhoto(postDoc.userModelDocRef.userModel.userName,
+                    postDoc.userModelDocRef.userModel.photoUrl),
+                // 投稿日を表示する
+                _returnPostedDateTime(postDoc.postModel.createdAt, format),
+              ],
             ),
-          ),
-          Divider(
-            color: Colors.grey.shade300,
-          ),
-          InkWell(
-            splashColor: Colors.lightBlueAccent.shade100,
-            onTap: () {
-              Navigator.of(context).pushNamed('/details',
-                  arguments: UserModelDoc(postDoc.userModelDocRef.userId,
-                      postDoc.userModelDocRef.userModel, postDoc));
-            },
-            child: Container(
-              width: MediaQuery.of(context).size.width,
-              child: Column(
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.all(10.0),
-                    child: Text(
-                      postDoc.postModel.content[PostModelField.title],
-                      style: TextStyle(fontSize: 22),
-                    ),
-                  ),
-                  Text(
-                    postDoc.postModel.content[PostModelField.overview],
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
+            Wrap(
+              runSpacing: 2.0,
+              spacing: -6.0,
+              alignment: WrapAlignment.start,
+              children: createChipList(
+                  // 使用技術のチップリストを返す
+                  postDoc.postModel.content[PostModelField.programmingLanguage]
+                      .cast<String>(),
+                  0.75),
+            ),
+            Container(
+              width: 360,
+              height: 200,
+              child: CachedNetworkImage(
+                imageUrl: postDoc.postModel.content[PostModelField.imageUrl],
+                placeholder: (context, url) => CircularProgressIndicator(),
+                errorWidget: (context, url, error) => Icon(Icons.error_outline),
+                fit: BoxFit.cover,
               ),
             ),
-          ),
-          Divider(
-            color: Colors.grey.shade300,
-          ),
-          Row(
-            children: <Widget>[
-              Container(
-                child: Expanded(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Padding(
-                        padding: EdgeInsets.only(right: 0.0),
-                        child: Text(
-                          '${postDoc.postModel.likesCount} Likes!',
-                          style: _likesCountText(postDoc.postModel.likesCount),
-                        ),
+            Divider(
+              color: Colors.grey.shade300,
+            ),
+            InkWell(
+              splashColor: Colors.lightBlueAccent.shade100,
+              onTap: () {
+                Navigator.of(context).pushNamed('/details',
+                    arguments: UserModelDoc(postDoc.userModelDocRef.userId,
+                        postDoc.userModelDocRef.userModel, postDoc));
+              },
+              child: Container(
+                width: MediaQuery.of(context).size.width,
+                child: Column(
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.all(10.0),
+                      child: Text(
+                        postDoc.postModel.content[PostModelField.title],
+                        style: TextStyle(fontSize: 22),
                       ),
-                      StreamBuilder<List<String>>(
-                        stream: _userCtrl.getMyFavoriteList,
-                        builder: (context, snapshot) {
-                          return IconButton(
-                            color: snapshot.hasData &&
-                                    snapshot.data.contains(postDoc.postId) ==
-                                        true
-                                ? Colors.yellow
-                                : Colors.black,
-                            splashColor: Colors.yellowAccent,
-                            icon: Icon(Icons.star_border),
-                            onPressed: () async {
-                              _postCtrl.addLikesCount(
-                                  postDoc.postId, _userCtrl.getId);
-                              _userCtrl.updateMyFavoriteList(_userCtrl.getId);
-                            },
-                          );
-                        },
-                      ),
-                      IconButton(
-                        splashColor: Colors.lightBlueAccent.shade100,
-                        icon: Icon(Icons.share),
-                        onPressed: () async {
-                          var response = await FlutterShareMe().shareToTwitter(
-                            url: '',
-                            msg: _twitterMessage(
-                                postDoc.postModel.content[PostModelField.title],
-                                postDoc.userModelDocRef.userModel.userName),
-                          );
-                        },
-                      ),
-                      IconButton(
-                          splashColor: Colors.red.shade300,
-                          icon: Icon(Icons.mood_bad),
-                          onPressed: () {}),
-                    ],
-                  ),
+                    ),
+                    Text(
+                      postDoc.postModel.content[PostModelField.overview],
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ),
               ),
-            ],
-          )
-        ],
-      ),
-    );
+            ),
+            Divider(
+              color: Colors.grey.shade300,
+            ),
+            Row(
+              children: <Widget>[
+                Container(
+                  child: Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Padding(
+                          padding: EdgeInsets.only(right: 0.0),
+                          child: Text(
+                            '${postDoc.postModel.likesCount} Likes!',
+                            style:
+                                _likesCountText(postDoc.postModel.likesCount),
+                          ),
+                        ),
+                        // いいねボタンクラス
+                        LikesIcon(postDoc.postId),
+                        IconButton(
+                          splashColor: Colors.lightBlueAccent.shade100,
+                          icon: Icon(Icons.share),
+                          onPressed: () async {
+                            var response =
+                                await FlutterShareMe().shareToTwitter(
+                              url: '',
+                              msg: _twitterMessage(
+                                  postDoc
+                                      .postModel.content[PostModelField.title],
+                                  postDoc.userModelDocRef.userModel.userName),
+                            );
+                          },
+                        ),
+                        IconButton(
+                            splashColor: Colors.red.shade300,
+                            icon: Icon(Icons.mood_bad),
+                            onPressed: () {}),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            )
+          ],
+        ),
+      );
+    });
   }
 
   // 現在から投稿日までの経過時間を表示するウィジェット
@@ -267,5 +245,32 @@ $title
       _style = TextStyle(fontWeight: FontWeight.w700);
     }
     return _style;
+  }
+}
+
+//
+class LikesIcon extends StatelessWidget {
+  final postId;
+
+  LikesIcon(this.postId);
+
+  @override
+  Widget build(BuildContext context) {
+    final _userCtrl = Provider.of<UserBloc>(context);
+    return StreamBuilder<List<String>>(
+      stream: _userCtrl.getMyFavoriteList,
+      builder: (context, snapshot) {
+        return IconButton(
+          color: snapshot.hasData && snapshot.data.contains(postId) == true
+              ? Colors.yellow
+              : Colors.black,
+          splashColor: Colors.yellowAccent,
+          icon: Icon(Icons.star_border),
+          onPressed: () async {
+            _userCtrl.updateMyFavoriteList(postId, _userCtrl.getId);
+          },
+        );
+      },
+    );
   }
 }

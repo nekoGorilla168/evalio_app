@@ -36,15 +36,17 @@ class AuthRepository {
   // FireAuthよりユーザー情報取得
   Future<UserModel> getFromFirebaseAuth() async {
     Future<UserModel> userModel = fireAuth.signInTwitter().then((userInfo) {
-      String uid;
+      UserUpdateInfo userUpdateInfo = new UserUpdateInfo();
       String userName;
       String photoUrl;
       for (UserInfo data in userInfo.providerData) {
-        uid = data.uid;
         userName = data.displayName;
         photoUrl = data.photoUrl;
       }
-      return new UserModel(userId: uid, userName: userName, photoUrl: photoUrl);
+      userUpdateInfo.displayName = userName;
+      userUpdateInfo.photoUrl = photoUrl;
+      return new UserModel(
+          userId: userInfo.uid, userName: userName, photoUrl: photoUrl);
     });
     return userModel;
   }

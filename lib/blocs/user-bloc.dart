@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:evalio_app/models/user_model.dart';
 import 'package:evalio_app/repository/base_auth_repository.dart';
+import 'package:evalio_app/repository/posts_repository.dart';
 import 'package:evalio_app/repository/users_repository.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -11,6 +12,8 @@ class UserBloc {
   final _authRepository = AuthRepository();
   // ユーザーリポジトリクラス
   final _userRepositpry = UserRepository();
+  // 投稿リポジトリクラス
+  final _postRepository = PostsRepositpry();
 
   // ユーザー情報
   final _userController = StreamController<UserModelDoc>.broadcast();
@@ -91,7 +94,8 @@ class UserBloc {
   }
 
   // お気に入りのリストリストを更新する
-  void updateMyFavoriteList(String userId) async {
+  void updateMyFavoriteList(String postId, String userId) async {
+    _postRepository.addLikes(postId, userId);
     List<String> likedList = await _userRepositpry.getMyFavoriteList(userId);
     if (likedList != null) {
       _myFavoriteList.sink.add(likedList);

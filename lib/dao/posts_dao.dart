@@ -200,12 +200,9 @@ class PostsDao {
   }
 
   // いいねをカウントし、お気に入りに追加・削除する
-  Future<int> addLikesCount(String postId, String userId) async {
+  addLikesCount(String postId, String userId) async {
     // バッチ処理用
     var batch = Firestore.instance.batch();
-    // true: 追加
-    // false: 削除
-    int isAdd = -1;
     var postRef = fsPosts.document(postId);
     var userRef = fsUsers.document(userId);
     DocumentSnapshot doc = await userRef.get();
@@ -219,8 +216,6 @@ class PostsDao {
         UserModelField.likedPost: FieldValue.arrayUnion([postId])
       });
       batch.commit();
-      isAdd = 1;
-      return isAdd;
     } else {
       batch.updateData(
           postRef, {PostModelField.likesCount: FieldValue.increment(-1)});
@@ -228,8 +223,6 @@ class PostsDao {
         UserModelField.likedPost: FieldValue.arrayRemove([postId])
       });
       batch.commit();
-      isAdd = 0;
-      return isAdd;
     }
   }
 
