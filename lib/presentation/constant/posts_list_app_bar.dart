@@ -12,7 +12,6 @@ class PostsListAppBar extends StatelessWidget with PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final _ctrlUser = Provider.of<UserBloc>(context);
-    var _postsCtrl = Provider.of<PostsBloc>(context);
 
     print('Buid ConstAppBar');
     return SafeArea(

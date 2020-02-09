@@ -1,4 +1,5 @@
 import 'package:evalio_app/blocs/bottom-navibar-bloc.dart';
+import 'package:evalio_app/blocs/posts_bloc.dart';
 import 'package:evalio_app/blocs/user-bloc.dart';
 import 'package:evalio_app/models/user_model.dart';
 import 'package:evalio_app/presentation/constant/posts_list_app_bar.dart';
@@ -16,16 +17,6 @@ class Home extends StatelessWidget {
   // オプショナルコンストラクタ
   Home([this.id]);
 
-  // ユーザー情報取得
-
-  // AppBarリスト
-  static final _appBarList = [
-    PostsListAppBar(),
-    PostsListAppBar(),
-    PostsListAppBar(),
-    PostsListAppBar(),
-  ];
-
   // BottomNavBar遷移先ウィジェットリスト
   static final _pageWidgets = [
     PostsList(),
@@ -37,6 +28,7 @@ class Home extends StatelessWidget {
   // 画面に応じたボタンを返す
   Widget _returnFloatingActBtn(
       int gamenIndex, BuildContext context, UserModelDoc userModelDoc) {
+    final _postCtrl = Provider.of<PostsBloc>(context);
     switch (gamenIndex) {
       case 0: // 一覧画面
         return Column(
@@ -52,7 +44,10 @@ class Home extends StatelessWidget {
             ),
             FloatingActionButton(
               heroTag: "heroTag2",
-              onPressed: () {},
+              onPressed: () {
+                _postCtrl.getTrendPostsList();
+                _postCtrl.getNewPostsList();
+              },
               child: Icon(Icons.update),
             )
           ],
@@ -80,7 +75,7 @@ class Home extends StatelessWidget {
       _ctrlUser.getUserInfo(id);
       _ctrlUser.setUserId(id);
     }
-
+    // ホーム画面
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -123,23 +118,28 @@ class BottomNavibarConst extends StatelessWidget {
 
     return BottomNavigationBar(
       items: <BottomNavigationBarItem>[
+        // 投稿一覧画面
         BottomNavigationBarItem(
           icon: Icon(Icons.view_list),
           title: Text('一覧'),
         ),
+        // プロフィール検索画面
         BottomNavigationBarItem(
           icon: Icon(Icons.search),
           title: Text('検索'),
         ),
+        // プロフィール画面
         BottomNavigationBarItem(
           icon: Icon(Icons.person),
           title: Text('プロフィール'),
         ),
+        // 設定画面
         BottomNavigationBarItem(
           icon: Icon(Icons.settings),
           title: Text('その他'),
         )
       ],
+      // 画面のインデックスを管理する
       onTap: (int index) {
         _ctrlIndex.selectedNavBarIndexChanged(index);
       },

@@ -1,4 +1,5 @@
 import 'package:evalio_app/blocs/user-bloc.dart';
+import 'package:evalio_app/models/user_model.dart';
 import 'package:evalio_app/presentation/home/evalio_home.dart';
 import 'package:evalio_app/repository/base_auth_repository.dart';
 import 'package:evalio_app/repository/users_repository.dart';
@@ -33,21 +34,20 @@ class LoggedIn extends StatelessWidget {
               ),
               onPressed: () async {
                 // ログイン情報取得
-                _authRepository.getFromFirebaseAuth().then((userModel) {
-                  _authRepository
-                      .checkLoginRireki(userModel.userId)
-                      .then((isLoggedIn) {
-                    if (isLoggedIn == true) {
-                      // ユーザー情報を更新し、ログインする
-                      _userRepository.updateUserInfo(userModel);
-                      Navigator.of(context).pushReplacement(MaterialPageRoute(
-                          builder: (context) => Home(userModel.userId)));
-                    } else {
-                      _ctrlUser.shinkiToroku(userModel);
-                      Navigator.popAndPushNamed(context, '/home');
-                    }
-                  });
-                });
+                UserModel userModel =
+                    await _authRepository.getFromFirebaseAuth();
+                bool isLoggedIn =
+                    await _authRepository.checkLoginRireki(userModel.userId);
+                if (isLoggedIn == true) {
+                  // ユーザー情報を更新し、ログインする
+                  _userRepository.updateUserInfo(userModel);
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(
+                      builder: (context) => Home(userModel.userId)));
+                } else {
+                  // 新規登録
+                  _ctrlUser.shinkiToroku(userModel);
+                  Navigator.of(context).pushReplacementNamed('/home');
+                }
               },
             ),
           ],

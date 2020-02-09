@@ -176,8 +176,8 @@ class PostsRepositpry {
   }
 
   // いいねカウント
-  Future<int> addLikes(String postId, String userId) async {
-    return await _postDao.addLikesCount(postId, userId);
+  addLikes(String postId, String userId) async {
+    await _postDao.addLikesCount(postId, userId);
   }
 
   // ポートフォリオの削除

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:evalio_app/blocs/markdown_bloc.dart';
 import 'package:evalio_app/blocs/posts_bloc.dart';
 import 'package:evalio_app/blocs/user-bloc.dart';
@@ -5,6 +7,7 @@ import 'package:evalio_app/models/const_programming_language_model.dart';
 import 'package:evalio_app/models/posts_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -167,29 +170,32 @@ class DescriptionPortfolioEditor extends StatelessWidget {
 
   // アプリのタイトルの入力域
   Widget _applicationTitleInputArea() {
-    return Container(child: Builder(
-      builder: (BuildContext context) {
-        final _markdownCtrl = Provider.of<MarkDownBloc>(context);
-        return TextFormField(
-          keyboardType: TextInputType.multiline,
-          minLines: 1,
-          maxLines: 2,
-          maxLength: 30,
-          decoration: InputDecoration(
-              hintMaxLines: 30,
-              border: UnderlineInputBorder(),
-              icon: Icon(
-                Icons.web,
-                color: Colors.blueAccent,
-              ),
-              hintText: '書籍管理共有アプリケーション',
-              labelText: 'アプリケーショ名(タイトル)'),
-          onChanged: (String data) {
-            _markdownCtrl.setAppTitle(data);
+    return Container(
+        margin: EdgeInsets.all(10.0),
+        child: Builder(
+          builder: (BuildContext context) {
+            final _markdownCtrl = Provider.of<MarkDownBloc>(context);
+            return TextFormField(
+              keyboardType: TextInputType.multiline,
+              minLines: 1,
+              maxLines: 2,
+              maxLength: 30,
+              initialValue: _markdownCtrl.getAppTitle ?? "",
+              decoration: InputDecoration(
+                  hintMaxLines: 30,
+                  border: UnderlineInputBorder(),
+                  icon: Icon(
+                    Icons.web,
+                    color: Colors.blueAccent,
+                  ),
+                  hintText: '書籍管理共有アプリケーション',
+                  labelText: 'アプリケーショ名(タイトル)'),
+              onChanged: (String data) {
+                _markdownCtrl.setAppTitle(data);
+              },
+            );
           },
-        );
-      },
-    ));
+        ));
   }
 
   // フィルターチップのリストを返す
@@ -227,7 +233,9 @@ class DescriptionPortfolioEditor extends StatelessWidget {
         style: TextStyle(color: Colors.lightBlue),
       ),
       onTap: () async {
-        var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+        File image = await ImagePicker.pickImage(
+            source: ImageSource.gallery, imageQuality: 80);
+
         bloc.setPhoto(image);
       },
     );
@@ -249,8 +257,11 @@ class DescriptionPortfolioEditor extends StatelessWidget {
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.grey),
               ),
-              child: Center(
-                child: Text('サムネイルとなる写真を投稿してみよう'),
+              child: Container(
+                height: 240,
+                child: Center(
+                  child: Text('サムネイルとなる写真を投稿してみよう'),
+                ),
               ),
             ),
     );
@@ -261,11 +272,13 @@ class DescriptionPortfolioEditor extends StatelessWidget {
     return Consumer<MarkDownBloc>(
       builder: (_, bloc, __) {
         return Container(
+          margin: EdgeInsets.all(10.0),
           child: TextFormField(
             keyboardType: TextInputType.multiline,
             minLines: 1,
             maxLines: null,
             maxLength: 100,
+            initialValue: bloc.getUrl,
             decoration: InputDecoration(
               hintMaxLines: 200,
               icon: Icon(
@@ -288,11 +301,13 @@ class DescriptionPortfolioEditor extends StatelessWidget {
     return Consumer<MarkDownBloc>(
       builder: (_, bloc, __) {
         return Container(
-          child: TextField(
+          margin: EdgeInsets.all(10.0),
+          child: TextFormField(
             keyboardType: TextInputType.multiline,
             minLines: 1,
             maxLines: null,
             maxLength: 100,
+            initialValue: bloc.getAppOverView,
             decoration: InputDecoration(
                 border: UnderlineInputBorder(),
                 icon: Icon(
@@ -315,12 +330,14 @@ class DescriptionPortfolioEditor extends StatelessWidget {
     return Consumer<MarkDownBloc>(
       builder: (_, bloc, __) {
         return Container(
+          margin: EdgeInsets.all(10.0),
           height: 100,
-          child: TextField(
+          child: TextFormField(
             keyboardType: TextInputType.multiline,
             minLines: 1,
             maxLines: null,
             maxLength: 800,
+            initialValue: bloc.getMarkDownData,
             decoration: InputDecoration(
                 border: UnderlineInputBorder(),
                 icon: Icon(
@@ -397,9 +414,10 @@ class DescriptionPortfolioEditor extends StatelessWidget {
         fontSize: 28.0,
         fontWeight: FontWeight.bold,
         decoration: TextDecoration.underline,
-        decorationStyle: TextDecorationStyle.dotted);
+        decorationStyle: TextDecorationStyle.solid);
     return Container(
-      padding: EdgeInsets.only(top: 5.0, right: 220, bottom: 15.0),
+      alignment: Alignment.centerLeft,
+      padding: EdgeInsets.only(top: 5.0, left: 10.0, bottom: 15.0),
       child: Text(
         'Overview',
         style: _overviewStyle,
@@ -422,9 +440,10 @@ class DescriptionPortfolioEditor extends StatelessWidget {
         fontSize: 28.0,
         fontWeight: FontWeight.bold,
         decoration: TextDecoration.underline,
-        decorationStyle: TextDecorationStyle.dotted);
+        decorationStyle: TextDecorationStyle.solid);
     return Container(
-      padding: EdgeInsets.only(top: 5.0, right: 250, bottom: 15.0),
+      alignment: Alignment.centerLeft,
+      padding: EdgeInsets.only(top: 5.0, left: 10.0, bottom: 15.0),
       child: Text(
         'Details',
         style: _detailsStyle,

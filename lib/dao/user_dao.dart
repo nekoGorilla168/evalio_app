@@ -10,11 +10,10 @@ class UserDao {
   Future<bool> checkRegisteredUser(String id) async {
     bool isExist = false;
 
-    fsUser.document(id).get().then((userData) {
-      if (userData.exists) {
-        isExist = true;
-      }
-    });
+    DocumentSnapshot doc = await fsUser.document(id).get();
+    if (doc.exists) {
+      isExist = true;
+    }
     return isExist;
   }
 
@@ -70,8 +69,10 @@ class UserDao {
 
   // 全てのデータを削除する
   void deleteAllData(String userId, String postId) async {
-    fsPosts.document(postId).delete();
-    fsUser.document(userId).collection(postId).document().delete();
+    if (postId != null) {
+      fsPosts.document(postId).delete();
+      fsUser.document(userId).collection('post').document(postId).delete();
+    }
     fsUser.document(userId).delete();
   }
 }

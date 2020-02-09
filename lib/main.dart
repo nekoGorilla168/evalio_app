@@ -4,6 +4,7 @@ import 'package:evalio_app/blocs/markdown_bloc.dart';
 import 'package:evalio_app/blocs/posts_bloc.dart';
 import 'package:evalio_app/blocs/search_condition_bloc.dart';
 import 'package:evalio_app/blocs/user-bloc.dart';
+import 'package:evalio_app/firebase/firebase_auth.dart';
 import 'package:evalio_app/presentation/constant/portfolio_details.dart';
 import 'package:evalio_app/presentation/editor/markdown_editor.dart';
 import 'package:evalio_app/presentation/home/evalio_home.dart';
@@ -15,26 +16,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 Future main() async {
   // 環境変数Load
   await DotEnv().load('.env');
-  String userInfo = await checkLoggedIn();
-  runApp(EvalioApp(userInfo));
-}
-
-// ログインチェック
-Future<String> checkLoggedIn() async {
-  final SharedPreferences pref = await SharedPreferences.getInstance();
-  return pref.getString(DotEnv().env['TWITTER_REGISTERED']);
+  String id = await FireAuth().getCurrentUser();
+  runApp(EvalioApp(id));
 }
 
 // ルートクラス
 class EvalioApp extends StatelessWidget {
-  final userInfo;
-
-  EvalioApp(this.userInfo);
+  final String id;
+  EvalioApp([this.id]);
 
   @override
   Widget build(BuildContext context) {
@@ -76,10 +69,10 @@ class EvalioApp extends StatelessWidget {
           primaryColor: Colors.white,
         ),
         debugShowCheckedModeBanner: false,
-        initialRoute: userInfo == null ? '/loggedIn' : '/home',
+        initialRoute: id == null ? '/loggedIn' : '/home',
         routes: {
           '/loggedIn': (context) => LoggedIn(),
-          '/home': (context) => Home(userInfo),
+          '/home': (context) => Home(id),
           '/editor': (context) => DescriptionPortfolioEditor(),
           '/profileEditor': (context) => ProfileEditor(),
           '/result': (context) => SearcResultPosts(),

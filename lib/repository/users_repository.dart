@@ -38,7 +38,9 @@ class UserRepository {
 
   // 全てのデータを削除する
   void deleteAllData(String userId, String postId, String imageName) {
-    _fireStorage.deleteImageFolder(userId, imageName);
+    if (imageName != null) {
+      _fireStorage.deleteImageFolder(userId, imageName);
+    }
     _userDao.deleteAllData(userId, postId);
   }
 }

@@ -8,8 +8,8 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class PostsList extends StatelessWidget {
+  // 共通処理クラス
   final CommonProcessing common = CommonProcessing();
-
   // 日付のフォーマット(yyyyMMdd)
   final _format = DateFormat("yyyyMMdd", "ja_JP");
 
@@ -103,20 +103,40 @@ class PostsList extends StatelessWidget {
               child: IndexedStack(
                 index: _streamCtrl.getCurIndex,
                 children: <Widget>[
+                  // トレンドの投稿リスト
                   StreamBuilder<List<PostModelDoc>>(
                     stream: _postsCtrl.getTrendPosts,
                     builder: (context, snapshot) {
                       return snapshot.hasData
-                          ? common.postList(snapshot.data, _format, context)
-                          : CircularProgressIndicator();
+                          ? Container(
+                              child: ListView.builder(
+                                  itemCount: snapshot.data.length,
+                                  itemBuilder: (context, index) {
+                                    return common.createPostCard(
+                                        snapshot.data[index], _format);
+                                  }),
+                            )
+                          : Center(
+                              child: CircularProgressIndicator(),
+                            );
                     },
                   ),
+                  // 最新の投稿リスト
                   StreamBuilder<List<PostModelDoc>>(
                     stream: _postsCtrl.getNewPosts,
                     builder: (context, snapshot) {
                       return snapshot.hasData
-                          ? common.postList(snapshot.data, _format, context)
-                          : CircularProgressIndicator();
+                          ? Container(
+                              child: ListView.builder(
+                                  itemCount: snapshot.data.length,
+                                  itemBuilder: (context, index) {
+                                    return common.createPostCard(
+                                        snapshot.data[index], _format);
+                                  }),
+                            )
+                          : Center(
+                              child: CircularProgressIndicator(),
+                            );
                     },
                   ),
                 ],

@@ -33,9 +33,9 @@ class ProfileEditor extends StatelessWidget {
         appBar: AppBar(
           title: Text('プロフィール編集'),
         ),
-        body: Container(
-          child: SingleChildScrollView(
-            child: Column(
+        body: ListView(
+          children: <Widget>[
+            Column(
               children: <Widget>[
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -69,8 +69,8 @@ class ProfileEditor extends StatelessWidget {
                 _inputArea('自己紹介', _person, 1, _userCtrl),
                 _inputArea('好きな・興味のある技術', _technique, 2, _userCtrl),
               ],
-            ),
-          ),
+            )
+          ],
         ),
       ),
     );
@@ -91,6 +91,7 @@ class ProfileEditor extends StatelessWidget {
     }
 
     return Container(
+      margin: EdgeInsets.all(10.0),
       child: TextFormField(
         keyboardType: TextInputType.multiline,
         minLines: 1,
