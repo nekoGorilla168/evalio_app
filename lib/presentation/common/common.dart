@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:evalio_app/blocs/posts_bloc.dart';
 import 'package:evalio_app/blocs/user-bloc.dart';
+import 'package:evalio_app/firebase/admob_manage.dart';
 import 'package:evalio_app/models/const_programming_language_model.dart';
 import 'package:evalio_app/models/posts_model.dart';
 import 'package:evalio_app/models/user_model.dart';
@@ -54,9 +55,6 @@ class CommonProcessing {
   // カードを作成するメソッド
   Widget createPostCard(PostModelDoc postDoc, DateFormat format) {
     return Builder(builder: (BuildContext context) {
-      final _postCtrl = Provider.of<PostsBloc>(context);
-      final _userCtrl = Provider.of<UserBloc>(context);
-
       return Card(
         elevation: 5,
         child: Column(
@@ -96,6 +94,7 @@ class CommonProcessing {
             InkWell(
               splashColor: Colors.lightBlueAccent.shade100,
               onTap: () {
+                AdmobManage.adDispose(gamenIndex: 2);
                 Navigator.of(context).pushNamed('/details',
                     arguments: UserModelDoc(postDoc.userModelDocRef.userId,
                         postDoc.userModelDocRef.userModel, postDoc));
