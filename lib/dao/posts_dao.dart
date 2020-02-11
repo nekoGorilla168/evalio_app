@@ -12,6 +12,9 @@ class PostsDao {
   // 最大10件
   final int maxKensu = 10;
 
+  // 最大30件
+  final int searchMaxKensu = 30;
+
   // 開始日(2日前)
   final startDate = DateTime.now().subtract(new Duration(days: 2));
   // 終了日
@@ -59,6 +62,7 @@ class PostsDao {
         .where(
             '${PostModelField.content}.${PostModelField.programmingLanguage}',
             arrayContainsAny: langKey)
+        .limit(searchMaxKensu)
         .getDocuments();
     return qs.documents;
   }

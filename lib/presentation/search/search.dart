@@ -1,6 +1,8 @@
 import 'package:evalio_app/blocs/posts_bloc.dart';
 import 'package:evalio_app/blocs/search_condition_bloc.dart';
 import 'package:evalio_app/blocs/user-bloc.dart';
+import 'package:evalio_app/firebase/admob_manage.dart';
+
 import 'package:evalio_app/models/const_programming_language_model.dart';
 import 'package:evalio_app/presentation/common/common.dart';
 import 'package:flutter/material.dart';
@@ -168,6 +170,8 @@ class InputSearchCondition extends StatelessWidget {
       children: <Widget>[
         FlatButton.icon(
           onPressed: () {
+            // インター
+            AdmobManage.showInter();
             switch (cardNo) {
               case 0:
                 String userName = searchConditionBloc.getUserName;

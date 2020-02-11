@@ -25,18 +25,42 @@ class SearcResultPosts extends StatelessWidget {
           child: StreamBuilder<List<PostModelDoc>>(
             stream: _postCtrl.getSearchResult,
             builder: (context, snapshot) {
-              if (snapshot.data == null)
+              if (snapshot.hasError) {
+                return Center(
+                  child: Card(
+                    child: ListView(
+                      children: <Widget>[
+                        ListTile(
+                          leading: Icon(
+                            Icons.error,
+                            color: Colors.red,
+                          ),
+                          title: Text('Error!'),
+                        ),
+                        Container(
+                          padding: EdgeInsets.all(10.0),
+                          child: Text(
+                              '検索エラーが発生しました。検索条件が未指定、あるいは通信状況が悪い可能性があります。'),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }
+              if (snapshot.data == null) {
                 return Center(
                   child: CircularProgressIndicator(),
                 );
-              return Container(
-                child: ListView.builder(
-                    itemCount: snapshot.data.length,
-                    itemBuilder: (context, index) {
-                      return common.createPostCard(
-                          snapshot.data[index], _format);
-                    }),
-              );
+              } else {
+                return Container(
+                  child: ListView.builder(
+                      itemCount: snapshot.data.length,
+                      itemBuilder: (context, index) {
+                        return common.createPostCard(
+                            snapshot.data[index], _format);
+                      }),
+                );
+              }
             },
           ),
         ),

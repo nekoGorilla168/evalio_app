@@ -59,27 +59,29 @@ class PostsBloc {
   // 検索
   void getSerachResult({dynamic condition, int cardNo}) async {
     List<PostModelDoc> _resultList = [];
-    switch (cardNo) {
-      case 0:
-        // 名前から検索
-        _resultList = await _postRepository.getPortFolioByName(condition);
-        break;
-      case 1:
-        // プログラミング言語から検索
-        _resultList = await _postRepository.getPortfolioByLanag(condition);
-        break;
-      default:
-        // お気に入りのリストから検索
-        for (int i = 0; i < condition.length; i++) {
-          PostModelDoc postModelDoc =
-              await _postRepository.getPortfolioById(condition[i]);
-          if (postModelDoc != null) {
-            _resultList.add(postModelDoc);
+    if (condition != null) {
+      switch (cardNo) {
+        case 0:
+          // 名前から検索
+          _resultList = await _postRepository.getPortFolioByName(condition);
+          break;
+        case 1:
+          // プログラミング言語から検索
+          _resultList = await _postRepository.getPortfolioByLanag(condition);
+          break;
+        default:
+          // お気に入りのリストから検索
+          for (int i = 0; i < condition.length; i++) {
+            PostModelDoc postModelDoc =
+                await _postRepository.getPortfolioById(condition[i]);
+            if (postModelDoc != null) {
+              _resultList.add(postModelDoc);
+            }
           }
-        }
-        break;
+          break;
+      }
+      if (_resultList != null) _searchResultController.sink.add(_resultList);
     }
-    if (_resultList != null) _searchResultController.sink.add(_resultList);
   }
 
   // ポートフォリオを登録

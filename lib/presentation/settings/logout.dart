@@ -1,12 +1,11 @@
 import 'package:evalio_app/blocs/user-bloc.dart';
+import 'package:evalio_app/firebase/admob_manage.dart';
 import 'package:evalio_app/firebase/firebase_auth.dart';
 import 'package:evalio_app/models/posts_model.dart';
 import 'package:evalio_app/repository/users_repository.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Settings extends StatelessWidget {
   // ユーザーリポジトリ
@@ -14,13 +13,29 @@ class Settings extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final _url = "https://twitter.com/9KTwARQQ5qhwShi";
     // ユーザーブロック
     final _userCtrl = Provider.of<UserBloc>(context);
 
     return ListView(
       children: <Widget>[
         ListTile(
+          onTap: () async {
+            if (await canLaunch(_url)) {
+              launch(_url);
+            }
+          },
+          leading: Icon(
+            Icons.link,
+            color: Colors.indigo,
+          ),
+          title: Text('開発者Twitter'),
+        ),
+        Divider(),
+        ListTile(
           onTap: () {
+            AdmobManage.adDispose(gamenIndex: 2);
+            AdmobManage.showInter();
             FireAuth().twitterSignOut();
             Navigator.pushNamedAndRemoveUntil(
                 context, '/loggedIn', (Route<dynamic> route) => false);
@@ -48,6 +63,7 @@ class Settings extends StatelessWidget {
                           child: Text('キャンセル')),
                       FlatButton(
                           onPressed: () async {
+                            AdmobManage.adDispose(gamenIndex: 2);
                             _userRepository.deleteAllData(
                                 _userCtrl.getId,
                                 _userCtrl.getPostId,
