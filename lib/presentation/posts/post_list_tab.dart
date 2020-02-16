@@ -8,7 +8,7 @@ class PostListTabView extends StatelessWidget {
   Widget build(BuildContext context) {
     // トレンド最新を表示する
     return Container(
-      padding: EdgeInsets.only(top: 57.0),
+      padding: EdgeInsets.only(bottom: 20.0),
       child: TabBarView(
         children: [
           TrendList(),

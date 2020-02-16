@@ -1,106 +1,28 @@
-import 'package:firebase_admob/firebase_admob.dart';
+import 'package:admob_flutter/admob_flutter.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class AdmobManage {
-  static const MobileAdTargetingInfo mobileAd = MobileAdTargetingInfo(
-    keywords: <String>['flutterio', 'beautiful apps'],
-    childDirected: false,
-    contentUrl: 'https://flutter.io',
-  );
-  static BannerAd banner;
-
-  static InterstitialAd interstitialAd;
+  // インタースティシャル広告
+  static AdmobInterstitial interstitialAd;
 
   // 初期化処理
   static void initAdInfo() {
-    // バナー
-    banner ??= BannerAd(
-      adUnitId: BannerAd.testAdUnitId,
-      size: AdSize.fullBanner,
-      targetingInfo: mobileAd,
-      listener: (event) => print('Initialize Ad'),
-    );
-    interstitialAd = InterstitialAd(
-      adUnitId: InterstitialAd.testAdUnitId,
-      targetingInfo: mobileAd,
-    );
-    // バナーを表示
-    if (banner != null)
-      banner
-        ..load()
-        ..show(anchorOffset: 137.0, anchorType: AnchorType.top);
+    interstitialAd = AdmobInterstitial(
+        adUnitId: getInterId(),
+        listener: (AdmobAdEvent event, Map args) {
+          if (event == AdmobAdEvent.closed) interstitialAd.load();
+        });
+
+    interstitialAd.load();
   }
 
-  // バナー広告を作成する
-  static void createBannerForHome() {
-    // バナー
-    banner = BannerAd(
-      adUnitId: BannerAd.testAdUnitId,
-      size: AdSize.fullBanner,
-      targetingInfo: mobileAd,
-      listener: (event) => print('Initialize Ad'),
-    );
+  //Banner Ad Unit Id取得
+  static String getBannerId() {
+    return DotEnv().env['AD_UNIT_BANNER_ID'];
   }
 
-  // 設定画面用バナー広告を作成する
-  static void createBannerForSetting() {
-    // バナー
-    banner = BannerAd(
-      adUnitId: BannerAd.testAdUnitId,
-      size: AdSize.mediumRectangle,
-      targetingInfo: mobileAd,
-      listener: (event) => print('Initialize Ad'),
-    );
-  }
-
-  // ホーム画面用バナーを表示する
-  static void showBannerForHome() {
-    createBannerForHome();
-    // バナーを表示
-    banner
-      ..load()
-      ..show(anchorOffset: 137.0, anchorType: AnchorType.top);
-  }
-
-  // 設定画面用バナーを表示する
-  static void showBannerForSetteing() {
-    createBannerForSetting();
-    // バナーを表示
-    banner
-      ..load()
-      ..show(anchorOffset: 120.0, anchorType: AnchorType.bottom);
-  }
-
-  // インタースティシャル広告作成
-  static void createInter() {
-    interstitialAd = InterstitialAd(
-      adUnitId: InterstitialAd.testAdUnitId,
-      targetingInfo: mobileAd,
-    );
-  }
-
-  // インタースティシャル広告の表示
-  static void showInter() {
-    createInter();
-    // インタースティシャル広告表示
-    interstitialAd
-      ..load()
-      ..show();
-  }
-
-  // バナーを消す
-  static void adDispose({int gamenIndex}) async {
-    bool diss = false;
-    if (gamenIndex == 0) {
-      diss = await banner?.dispose();
-      banner = null;
-      showBannerForHome();
-    } else if (gamenIndex == 3) {
-      diss = await banner?.dispose();
-      banner = null;
-      showBannerForSetteing();
-    } else {
-      diss = await banner?.dispose();
-      banner = null;
-    }
+  // Interstitial Ad Unit Id 取得
+  static String getInterId() {
+    return DotEnv().env['AD_UNIT_INTER_ID'];
   }
 }

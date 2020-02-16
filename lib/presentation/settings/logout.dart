@@ -1,8 +1,10 @@
+import 'package:admob_flutter/admob_flutter.dart';
 import 'package:evalio_app/blocs/user-bloc.dart';
 import 'package:evalio_app/firebase/admob_manage.dart';
 import 'package:evalio_app/firebase/firebase_auth.dart';
 import 'package:evalio_app/models/posts_model.dart';
 import 'package:evalio_app/repository/users_repository.dart';
+import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -33,9 +35,10 @@ class Settings extends StatelessWidget {
         ),
         Divider(),
         ListTile(
-          onTap: () {
-            AdmobManage.adDispose(gamenIndex: 2);
-            AdmobManage.showInter();
+          onTap: () async {
+            if (await AdmobManage.interstitialAd.isLoaded) {
+              AdmobManage.interstitialAd.show();
+            }
             FireAuth().twitterSignOut();
             Navigator.pushNamedAndRemoveUntil(
                 context, '/loggedIn', (Route<dynamic> route) => false);
@@ -63,7 +66,6 @@ class Settings extends StatelessWidget {
                           child: Text('キャンセル')),
                       FlatButton(
                           onPressed: () async {
-                            AdmobManage.adDispose(gamenIndex: 2);
                             _userRepository.deleteAllData(
                                 _userCtrl.getId,
                                 _userCtrl.getPostId,
@@ -92,6 +94,28 @@ class Settings extends StatelessWidget {
           title: Text('アカウント削除'),
         ),
         Divider(),
+        ListTile(
+          onTap: () async {
+            String url = 'https://nekogorilla168.github.io/';
+            if (await canLaunch(url)) {
+              launch(url);
+            }
+          },
+          leading: Icon(
+            Icons.pages,
+            color: Colors.blue,
+          ),
+          title: Text('利用規約'),
+        ),
+        Divider(),
+        Container(
+          padding: EdgeInsets.only(top: 15.0),
+          alignment: Alignment.bottomCenter,
+          child: AdmobBanner(
+            adUnitId: AdmobManage.getBannerId(),
+            adSize: AdmobBannerSize.MEDIUM_RECTANGLE,
+          ),
+        ),
       ],
     );
   }

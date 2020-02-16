@@ -1,7 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:evalio_app/blocs/posts_bloc.dart';
 import 'package:evalio_app/blocs/user-bloc.dart';
-import 'package:evalio_app/firebase/admob_manage.dart';
 import 'package:evalio_app/models/const_programming_language_model.dart';
 import 'package:evalio_app/models/posts_model.dart';
 import 'package:evalio_app/models/user_model.dart';
@@ -9,7 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_share_me/flutter_share_me.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+// 共通処理クラス
 class CommonProcessing {
   // チップリストを返すウィジェット
   List<Widget> createChipList(List<String> programmingLanguage, double scale) {
@@ -94,7 +94,6 @@ class CommonProcessing {
             InkWell(
               splashColor: Colors.lightBlueAccent.shade100,
               onTap: () {
-                AdmobManage.adDispose(gamenIndex: 2);
                 Navigator.of(context).pushNamed('/details',
                     arguments: UserModelDoc(postDoc.userModelDocRef.userId,
                         postDoc.userModelDocRef.userModel, postDoc));
@@ -129,14 +128,6 @@ class CommonProcessing {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        Padding(
-                          padding: EdgeInsets.only(right: 0.0),
-                          child: Text(
-                            '${postDoc.postModel.likesCount} Likes!',
-                            style:
-                                _likesCountText(postDoc.postModel.likesCount),
-                          ),
-                        ),
                         // いいねボタンクラス
                         LikesIcon(postDoc.postId),
                         IconButton(
@@ -154,9 +145,16 @@ class CommonProcessing {
                           },
                         ),
                         IconButton(
-                            splashColor: Colors.red.shade300,
-                            icon: Icon(Icons.mood_bad),
-                            onPressed: () {}),
+                          tooltip: '不適切な投稿を開発者に通報する',
+                          splashColor: Colors.red.shade300,
+                          icon: Icon(Icons.mood_bad),
+                          onPressed: () async {
+                            String url = 'https://twitter.com/9KTwARQQ5qhwShi';
+                            if (await canLaunch(url)) {
+                              launch(url);
+                            }
+                          },
+                        ),
                       ],
                     ),
                   ),

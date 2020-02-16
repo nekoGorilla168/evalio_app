@@ -20,9 +20,10 @@ class FireStorage {
   // ファイルをアップロードするメソッド
   Future<Map<String, String>> uploadImage(File file, String userId) async {
     int timestamp = DateTime.now().millisecondsSinceEpoch;
+    String imageName = timestamp.toString() + userId;
     String subDirectoryName = userId;
     final StorageReference ref =
-        storage.ref().child(subDirectoryName).child('$timestamp');
+        storage.ref().child(subDirectoryName).child(imageName);
 
     final StorageUploadTask uploadTask = ref.putFile(
         file,
@@ -33,7 +34,7 @@ class FireStorage {
     if (snapshot.error == null) {
       return <String, String>{
         'url': await snapshot.ref.getDownloadURL(),
-        'name': timestamp.toString()
+        'name': imageName,
       };
     } else {}
   }

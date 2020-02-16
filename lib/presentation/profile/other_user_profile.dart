@@ -1,3 +1,5 @@
+import 'package:admob_flutter/admob_flutter.dart';
+import 'package:evalio_app/firebase/admob_manage.dart';
 import 'package:evalio_app/models/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -44,6 +46,11 @@ class OtherUserProfile extends StatelessWidget {
                       _interestIcon,
                       1,
                       context),
+                  Container(
+                    child: AdmobBanner(
+                        adUnitId: AdmobManage.getBannerId(),
+                        adSize: AdmobBannerSize.LARGE_BANNER),
+                  ),
                 ],
               ),
             ),
