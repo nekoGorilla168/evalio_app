@@ -43,12 +43,16 @@ dependencies:
   flutter_image_compress: ^0.6.5+1 # Image Compress
   url_launcher: ^5.4.1  # URL Launcher
   uuid: ^2.0.4  # UUID
+  admob_flutter: "^0.3.4" # Admob in Widget
 
 dev_dependencies:
+  flutter_launcher_icons: "^0.7.3" # Launcher Icon
   flutter_test:
     sdk: flutter
 
-
+flutter_icons:
+  android: "launcher_icon" 
+  image_path: "assets/icon/icon-512.png"
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 

@@ -30,6 +30,7 @@ class ProgrammingLangMap {
     "028": "Objective-C",
     "029": "Bootstrap",
     "030": "Flask",
+    "031": "その他",
   };
 
   // プログラミング言語名のリスト

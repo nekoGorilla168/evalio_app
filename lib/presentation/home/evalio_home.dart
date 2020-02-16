@@ -14,7 +14,7 @@ class Home extends StatelessWidget {
   final String id;
   // オプショナルコンストラクタ
   Home([this.id]) {
-    AdmobManage.initAdInfo();
+    //AdmobManage.initAdInfo();
   }
 
   // BottomNavBar遷移先ウィジェットリスト
@@ -37,7 +37,6 @@ class Home extends StatelessWidget {
               color: Colors.black,
             ),
             onPressed: () {
-              AdmobManage.adDispose(gamenIndex: 2);
               Navigator.of(context).pushNamed("/editor");
             });
         break;
@@ -177,7 +176,6 @@ class BottomNavibarConst extends StatelessWidget {
         // 画面のインデックスを管理する
         onTap: (int index) {
           _ctrlIndex.selectedNavBarIndexChanged(index);
-          AdmobManage.adDispose(gamenIndex: index);
         },
         type: BottomNavigationBarType.fixed,
         currentIndex: _ctrlIndex.getCurIndex,

@@ -169,9 +169,11 @@ class InputSearchCondition extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.end,
       children: <Widget>[
         FlatButton.icon(
-          onPressed: () {
-            // インター
-            AdmobManage.showInter();
+          onPressed: () async {
+            // インタースティシャル広告
+            if (await AdmobManage.interstitialAd.isLoaded) {
+              AdmobManage.interstitialAd.show();
+            }
             switch (cardNo) {
               case 0:
                 String userName = searchConditionBloc.getUserName;

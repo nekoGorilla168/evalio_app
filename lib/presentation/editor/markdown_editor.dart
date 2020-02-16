@@ -3,12 +3,11 @@ import 'dart:io';
 import 'package:evalio_app/blocs/markdown_bloc.dart';
 import 'package:evalio_app/blocs/posts_bloc.dart';
 import 'package:evalio_app/blocs/user-bloc.dart';
+import 'package:evalio_app/firebase/admob_manage.dart';
 import 'package:evalio_app/models/const_programming_language_model.dart';
 import 'package:evalio_app/models/posts_model.dart';
-import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -107,7 +106,7 @@ class DescriptionPortfolioEditor extends StatelessWidget {
                                 ),
                                 FlatButton(
                                   child: Text('OK'),
-                                  onPressed: () {
+                                  onPressed: () async {
                                     // ポートフォリオ登録
                                     _postCtrl.addPostData(
                                         _userCtrl.getPostId,
@@ -124,14 +123,11 @@ class DescriptionPortfolioEditor extends StatelessWidget {
                                         _markdownCtrl.getMarkDownData,
                                         _userCtrl.getId);
                                     _userCtrl.getUserInfo(_userCtrl.getId);
-                                    InterstitialAd interstitialAd =
-                                        InterstitialAd(
-                                      adUnitId: InterstitialAd.testAdUnitId,
-                                      listener: (event) => print("$event"),
-                                    );
-                                    interstitialAd
-                                      ..load()
-                                      ..show();
+
+                                    if (await AdmobManage
+                                        .interstitialAd.isLoaded) {
+                                      AdmobManage.interstitialAd.show();
+                                    }
                                     Navigator.popUntil(
                                         context, ModalRoute.withName('/home'));
                                   },

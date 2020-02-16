@@ -1,5 +1,8 @@
+import 'package:admob_flutter/admob_flutter.dart';
 import 'package:evalio_app/blocs/user-bloc.dart';
+import 'package:evalio_app/firebase/admob_manage.dart';
 import 'package:evalio_app/models/user_model.dart';
+import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -64,7 +67,12 @@ class Profile extends StatelessWidget {
                   child: snapshot.data.postModelDoc == null
                       ? Text('ポートフォリオを投稿してみよう')
                       : Text('自分のポートフォリオを確認する'),
-                )
+                ),
+                Container(
+                  child: AdmobBanner(
+                      adUnitId: AdmobManage.getBannerId(),
+                      adSize: AdmobBannerSize.LARGE_BANNER),
+                ),
               ],
             ),
           );

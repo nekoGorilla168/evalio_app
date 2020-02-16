@@ -8,8 +8,8 @@
          FlutterApplication and put your custom class here. -->
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="evalio_app"
-        android:icon="@mipmap/ic_launcher">
+        android:label="evalio"
+        android:icon="@mipmap/launcher_icon">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
@@ -31,6 +31,6 @@
         </activity>
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-6657409011054605~2566412187"/>
+            android:value="ca-app-pub-9826467619255646~8700198397"/>
     </application>
 </manifest>
